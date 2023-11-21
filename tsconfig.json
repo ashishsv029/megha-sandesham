@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "target": "es2020",
+    "module": "es2020",                                /* Specify what module code is generated. */
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "noEmit": true,
+    "strict": true,                                  /* Enable all strict type-checking options. */
+    "allowImportingTsExtensions": true,
+
+  },
+}

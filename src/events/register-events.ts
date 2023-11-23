@@ -19,14 +19,17 @@ class RegisterEvents {
 
     register() {
         this.io.on('connection', (socket:CustomSocket):void => {
+            //validate whether the connection is authenticated or not
             this.registerSocketEvents(socket)
             this.eventHandler.connectionHandler(socket)
         });
     }
 
     registerSocketEvents(socket:CustomSocket):void {
-        socket.on('disconnect', this.eventHandler.disConnectionHandler.bind(this.eventHandler, socket))
+        socket.on('disconnect', this.eventHandler.disConnectionHandler.bind(this.eventHandler, socket)) // bind is used as we are just assigning the function defination (which will not give the associated context i.e lexical scope.. so accessing any properties defined in constructor errors.. so manuall attaching the context using bind)
         socket.on('chat-message', this.eventHandler.chatMessageHandler.bind(this.eventHandler, socket))
+        socket.onAny(this.eventHandler.onAnyEventHandler.bind(this.eventHandler)) //socket.on
+        socket.onAnyOutgoing(this.eventHandler.onAnyOutGoingEventHandler.bind(this.eventHandler)) //io.emit
     }
 
 

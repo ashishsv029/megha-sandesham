@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { Dependencies } from '../typings/app-loader-types.ts';
 import RegisterEvents from './events/register-events.ts';
+import RegisterRoutes from './routes/register-routes.ts';
 
 class AppLoader {
     
@@ -24,8 +25,9 @@ class AppLoader {
         this.initializeHTTPServer();
         this.registerMiddlewares(); 
         this.mountWebSocketServer();
-        this.registerWSEvents().register();
-        //this.registerRoutes();
+        this.registerWSMiddlewares();
+        this.registerWSEvents();
+        this.registerRoutes();
 
     }
 
@@ -47,10 +49,23 @@ class AppLoader {
     registerMiddlewares() {
         const app = this.dependencies.app;
         app.use(express.static(new URL('../public', import.meta.url).pathname)); //middleware
+        app.use(express.json()) // body parser middleware
+    }
+
+    registerWSMiddlewares() {
+        const io = this.dependencies.webSocketIOServer;
+        io.use((socket:any, next:any)=>{
+            console.log('middleware');
+            return next();
+        }); //move to a seperate file
     }
 
     registerWSEvents() {
-        return new RegisterEvents(this.dependencies, this.config);
+        (new RegisterEvents(this.dependencies, this.config)).register();
+    }
+
+    registerRoutes() {
+        (new RegisterRoutes(this.dependencies, this.config)).register();
     }
 }
 

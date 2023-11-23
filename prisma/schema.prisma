@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  // for more details regarding the params see the user-db-accessor file
+  maxPoolingConnections = 10
+  minPoolingConnections = 2
+  connectionTimeout = 30000
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum RoomTypes {
+  group
+  dm
+}
+
+model user {
+  id   String     @id @default(uuid())
+  name  String
+  email String  @unique
+  created_at DateTime  @default(now())
+  modified_at DateTime @default(now()) @updatedAt
+  messagesSent message[] @relation("MessagesFromUser")
+  messagesReceived message[] @relation("MessagesToUser")
+  associatedRooms room[] @relation("UserInRoom")
+}
+
+model room {
+  id     String      @id @default(uuid())
+  name    String
+  type    RoomTypes
+  max_participants Int
+  is_private Boolean
+  created_at DateTime  @default(now())
+  modified_at DateTime @default(now()) @updatedAt
+  messagesPresent message[] @relation("MessageSentInRoom")
+  associatedUsers user[] @relation("UserInRoom")
+}
+
+model message {
+  id     String       @id @default(uuid())
+  text    String
+  from_user   String
+  to_user     String
+  fromUser  user      @relation("MessagesFromUser", fields: [from_user], references: [id])
+  toUser    user      @relation("MessagesToUser", fields: [to_user], references: [id])
+  room_id String
+  roomMessages    room      @relation("MessageSentInRoom", fields: [room_id], references: [id])
+  is_sent Boolean
+  is_delivered Boolean
+  is_seen Boolean
+  created_at DateTime @default(now())
+}

@@ -1,5 +1,14 @@
-const socket = io();//see here as it is a client, then we always use socket as object and not io
-
+const socket = io({
+    transports: ['websocket'],
+    extraHeaders: {
+        "x-ms-user-info": JSON.stringify({
+            id: "b10bcdc6-a5ef-4eb0-944f-5e1dbdeed03e",
+            name: "Aswad"
+        }) 
+    }
+});//see here as it is a client, then we always use socket as object and not io
+//socket.handshake.headers = {"id":"b10bcdc6-a5ef-4eb0-944f-5e1dbdeed03e","name":"Aswad"}
+//socket.connect()
 const clientTotal = document.getElementById('client-total');
 const messageContainer = document.getElementById('message-container');
 socket.on('socket-pool-size-changed', (data)=>{
@@ -18,12 +27,17 @@ const insertMessageInChatContainer = (isReceivedMessage, data) => {
     scrollToBottom();
 }
 
-socket.on('chat-message', (isReceivedMessage, data)=>{
+socket.on('chat-message', (isReceivedMessage, data, callback)=>{
     console.log(data)
     //update chatting container
     insertMessageInChatContainer(isReceivedMessage, data);
     scrollToBottom();
+    console.log(callback)
     
+})
+
+socket.on('error', (data)=>{
+    alert('error - '+ data)
 })
 
 const messageForm = document.getElementById('message-form');

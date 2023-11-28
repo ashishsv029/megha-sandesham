@@ -20,6 +20,7 @@ class RegisterEvents {
     register() {
         this.io.on('connection', (socket:CustomSocket):void => {
             //validate whether the connection is authenticated or not
+            console.log(socket.handshake.headers)
             this.registerSocketEvents(socket)
             this.eventHandler.connectionHandler(socket)
         });
@@ -30,6 +31,8 @@ class RegisterEvents {
         socket.on('chat-message', this.eventHandler.chatMessageHandler.bind(this.eventHandler, socket))
         socket.onAny(this.eventHandler.onAnyEventHandler.bind(this.eventHandler)) //socket.on
         socket.onAnyOutgoing(this.eventHandler.onAnyOutGoingEventHandler.bind(this.eventHandler)) //io.emit
+        socket.on('create-group', this.eventHandler.createGroupHandler.bind(this.eventHandler, socket))
+        socket.on('message-acks', this.eventHandler.onMessageAcknowledgements.bind(this.eventHandler, socket))
     }
 
 

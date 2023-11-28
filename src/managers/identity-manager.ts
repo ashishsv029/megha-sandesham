@@ -16,6 +16,14 @@ class IdentityManager {
         }
     }
 
+    async fetchRoomsByUserId(userId:string) {
+        try {
+            return await this.userDBAccessor.fetchRoomsByUserId(userId);
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 

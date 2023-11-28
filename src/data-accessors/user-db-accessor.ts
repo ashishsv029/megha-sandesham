@@ -1,15 +1,16 @@
-import { PrismaClient } from '@prisma/client'
 // we can tweak the internal connection pool maintained by prisma from schema.prisma
-const prisma = new PrismaClient()
 
 class UserDbAccessor {
-    constructor(dependencies:any, config:any) {
 
+    [key:string]:{}
+    prisma:any
+    constructor(dependencies:any, config:any) {
+        this.prisma = dependencies.prisma
     }
 
     async insertUser(payload:any) {
         try {
-            const newUser = await prisma.user.create({
+            const newUser = await this.prisma.user.create({
                 data: payload
               });
             return newUser;
@@ -17,9 +18,29 @@ class UserDbAccessor {
             console.log(err);
             throw err;
         } finally {
-            await prisma.$disconnect();
+            await this.prisma.$disconnect();
         }
     }
+
+    async fetchRoomsByUserId(userId:string) {
+        try {
+            return await this.prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+                include: {
+                    associatedRooms: true
+                }
+            })
+        } catch (err) {
+            console.log(err);
+            throw err;
+        } finally {
+            await this.prisma.$disconnect
+        }
+    }
+
+
 }
 
 export default UserDbAccessor;

@@ -1,3 +1,11 @@
+Present Features
+  1. users need to register (backend yet to develop)
+  2. Can see other registered users (yet to develop)
+  3. Create a room and can do private chat (developed)
+  4. Create a group with multiple people and can chat in group (reconnections need to handle)
+        As a ff, we need to have a junction table between users and messages for read receipts - deliveryTable
+           (for group messages, message acknowledgement event should not directly update is_delivered in the messages table, rather it should add an entry in this junction table. Also, while fetching undelivered messages, we should fetch is_delivered:false&(no entry in junction table should be there for (userId:MessageId combo)), then the callback should add this entry )
+
 Data Modelling Guide:- 
 
 1. Identify Entities
@@ -10,7 +18,7 @@ Data Modelling Guide:-
 8. Add other relevant data integrity constraints (ex:- unique constraint, default constraint, check constraint)
 
 1. Entities
-    3 data models
+    3 data models 
 
     1. user model
     2. room model
@@ -20,13 +28,17 @@ Data Modelling Guide:-
 
     Relationships:- 
         user joins room
-        user sends message
+        user sends message (sendTo)
+        message gets delivered to user  (receivedFrom)
         room has message
+        room has a admin (user) //atleast for now we assume a room can have only one admin
 
     1. user - room (many to many bcs a user can be in any no of rooms and a room can have n number of users)
-    2. user - message (one to many bcs a user can send multiple messages)
-    3. room - message (one to many bcs a room can have multiple messages )
-    4. message - room (many to one bcs many messages are part of a single room)
+    2. user - message (one to many bcs a user can send multiple messages) 
+    3. user - message (many to many bcs a message can be delivered to multiple users and a user can have many messages getting delivered  )
+    4. room - message (one to many bcs a room can have multiple messages )
+    5. message - room (many to one bcs many messages are part of a single room)
+    6. user admins room (one to many bcs a user can be as an admin to many rooms)
 
 
 3. Attributes for the entities
@@ -101,3 +113,28 @@ model UserRooms {
   @@id([user_id, room_id])
 
 }
+
+
+
+Handling Disconnections 
+   to ensure client message sent to server --> acknowledgements from server
+   to ensure server message sent to client --> (i.e client state synchronization with server's state)
+                ---> whenever the client reconnects, the entire server's state should be sent to client (fetch all chat messages of that room)
+                ---> the client sends an offsetid (i.e nothing but last delived message id), then the server should send all the sent and undelivered messages after that offset
+
+
+
+User Actions
+1. initiate a new conversation 
+        (1
+        -1 room)
+            1. The sender should create a group (type dm)
+            2. The sender should send the message also
+            3. The server should join both the sender & receiver (& update junction table)
+            4. The server should broadcast emit the message in the room (stores the message and acknowledgement info)
+2. continue on an existing conversation (1-1)
+        (1-1 room)
+            1. The client connects to the server
+            2. Pull the latest delivered messages to the client (the client shares the last offset (message timestamp) for every room and gets undelivered messages per room after the timestamp )
+            3. use fetch messages per room API to retrieve all the messages (ideally fired when the user clicks on any room to see messages)
+            4?. handle html scroll appropriately (should be set to the last offset, on scroll bottom )

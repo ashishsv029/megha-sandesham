@@ -29,12 +29,16 @@ model user {
   messagesSent message[] @relation("MessagesFromUser")
   messagesReceived message[] @relation("MessagesToUser")
   associatedRooms room[] @relation("UserInRoom")
+  asAdmin room[] @relation("UserAdminsRoom")
 }
 
 model room {
   id     String      @id @default(uuid())
   name    String
   type    RoomTypes
+  admin   String?
+  roomAdmin user? @relation("UserAdminsRoom", fields:[admin], references:[id])
+  min_participants Int @default(2)
   max_participants Int
   is_private Boolean
   created_at DateTime  @default(now())
@@ -43,17 +47,20 @@ model room {
   associatedUsers user[] @relation("UserInRoom")
 }
 
+//to_user can be removed also as everyone in the room (dm: 2 mems, group:all others in group) will be notified
 model message {
   id     String       @id @default(uuid())
   text    String
   from_user   String
-  to_user     String
+  to_user     String?
   fromUser  user      @relation("MessagesFromUser", fields: [from_user], references: [id])
-  toUser    user      @relation("MessagesToUser", fields: [to_user], references: [id])
+  toUser    user?      @relation("MessagesToUser", fields: [to_user], references: [id])
   room_id String
   roomMessages    room      @relation("MessageSentInRoom", fields: [room_id], references: [id])
-  is_sent Boolean
-  is_delivered Boolean
-  is_seen Boolean
-  created_at DateTime @default(now())
+  is_sent Boolean @default(true)
+  is_delivered Boolean @default(false)
+  is_seen Boolean @default(false)
+  created_at DateTime @default(now()) //message sent timestamp
+  delivered_at DateTime?
+  seen_at DateTime?
 }

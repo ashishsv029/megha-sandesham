@@ -2,8 +2,11 @@ import express from 'express';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { Dependencies } from '../typings/app-loader-types.ts';
+import { PrismaClient } from '@prisma/client'
 import RegisterEvents from './events/register-events.ts';
 import RegisterRoutes from './routes/register-routes.ts';
+import { createAdapter } from "@socket.io/redis-streams-adapter"; // unlike redis-adapter which use pub sub, it uses redis streams to coordinate between multiple servers for propagating events // see keys * and MONITOR for seeing activity
+import { createClient } from "redis";
 
 class AppLoader {
     
@@ -14,17 +17,17 @@ class AppLoader {
 
     constructor() {
         this.config = {
-            appServerPort: 3000
+            appServerPort: 3002
 
         };
         this.dependencies = {};
     }
 
-    bootUpApp() {
+    async bootUpApp() {
         
         this.initializeHTTPServer();
         this.registerMiddlewares(); 
-        this.mountWebSocketServer();
+        await this.mountWebSocketServer();
         this.registerWSMiddlewares();
         this.registerWSEvents();
         this.registerRoutes();
@@ -41,8 +44,11 @@ class AppLoader {
         this.dependencies.httpAppServer = server;
     }
 
-    mountWebSocketServer() {
-        this.dependencies.webSocketIOServer = new Server(this.dependencies.httpAppServer);
+    async mountWebSocketServer() {
+        let redisClient = await createClient({ url: "redis://localhost:6379" }).on('error', err => console.log('Redis Client Error', err)).connect();
+        this.dependencies.webSocketIOServer = new Server(this.dependencies.httpAppServer, {
+            adapter: createAdapter(redisClient) // for facilitating communication bw clients connected to multiple ws servers
+          });
 
     }
 
@@ -50,6 +56,7 @@ class AppLoader {
         const app = this.dependencies.app;
         app.use(express.static(new URL('../public', import.meta.url).pathname)); //middleware
         app.use(express.json()) // body parser middleware
+        this.dependencies.prisma = new PrismaClient();
     }
 
     registerWSMiddlewares() {

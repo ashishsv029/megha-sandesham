@@ -1,7 +1,7 @@
 //import server object and register routes
 // call the route handlers specified in the other folder
-import IdentityRouteHandler from '../handlers/route-handlers/identity-route-handler.ts'
-import RoomRouteHandler from '../handlers/route-handlers/room-route-handler.ts'
+import IdentityRouteHandler from '../handlers/route-handlers/identity-route-handler'
+import RoomRouteHandler from '../handlers/route-handlers/room-route-handler'
 
 class RegisterRoutes {
     

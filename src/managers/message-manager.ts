@@ -1,4 +1,4 @@
-import MessageDbAccessor from "../data-accessors/message-db-accessor.ts";
+import MessageDbAccessor from "../data-accessors/message-db-accessor";
 
 
 class MessageManager {

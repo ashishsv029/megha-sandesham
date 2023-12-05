@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import IdentityManager from '../../managers/identity-manager.ts';
+import IdentityManager from '../../managers/identity-manager';
 
 class IdentityRouteHandler {
     [key:string]:{}

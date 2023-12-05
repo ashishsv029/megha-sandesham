@@ -1,8 +1,8 @@
 // import io and add/register io specific events
 // these events should use the eventHandlers defined in the other folder
 
-import EventHandler from '../handlers/event-handler.ts'
-import { CustomSocket } from '../../typings/socket-types.ts';
+import EventHandler from '../handlers/event-handler'
+import { CustomSocket } from '../../typings/socket-types';
 
 class RegisterEvents {
 

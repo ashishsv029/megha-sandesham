@@ -1,12 +1,13 @@
 import express from 'express';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
-import { Dependencies } from '../typings/app-loader-types.ts';
+import { Dependencies } from '../typings/app-loader-types';
 import { PrismaClient } from '@prisma/client'
-import RegisterEvents from './events/register-events.ts';
-import RegisterRoutes from './routes/register-routes.ts';
+import RegisterEvents from './events/register-events';
+import RegisterRoutes from './routes/register-routes';
 import { createAdapter } from "@socket.io/redis-streams-adapter"; // unlike redis-adapter which use pub sub, it uses redis streams to coordinate between multiple servers for propagating events // see keys * and MONITOR for seeing activity
 import { createClient } from "redis";
+import path from 'node:path';
 
 class AppLoader {
     
@@ -17,7 +18,7 @@ class AppLoader {
 
     constructor() {
         this.config = {
-            appServerPort: 3002
+            appServerPort: 3000
 
         };
         this.dependencies = {};
@@ -54,7 +55,8 @@ class AppLoader {
 
     registerMiddlewares() {
         const app = this.dependencies.app;
-        app.use(express.static(new URL('../public', import.meta.url).pathname)); //middleware
+        //app.use(express.static(new URL('../public', import.meta.url).pathname)); //middleware
+        app.use(express.static(path.join(__dirname, 'public'))); //middleware
         app.use(express.json()) // body parser middleware
         this.dependencies.prisma = new PrismaClient();
     }

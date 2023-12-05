@@ -1,3 +1,6 @@
+dist
 node_modules
 monolithcode.js
 .env
+coverage
+.nyc_output

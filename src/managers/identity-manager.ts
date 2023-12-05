@@ -1,4 +1,4 @@
-import UserDbAccessor from "../data-accessors/user-db-accessor.ts"
+import UserDbAccessor from "../data-accessors/user-db-accessor"
 class IdentityManager {
 
     [key:string]:{}

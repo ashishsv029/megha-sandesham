@@ -1,7 +1,7 @@
 import { Socket } from "socket.io";
-import RoomManager from "./room-manager.ts"
-import IdentityManager from "./identity-manager.ts";
-import MessageManager from "./message-manager.ts";
+import RoomManager from "./room-manager"
+import IdentityManager from "./identity-manager";
+import MessageManager from "./message-manager";
 
 interface Room {
     [key:string]: any;

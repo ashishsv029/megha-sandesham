@@ -1,5 +1,5 @@
-import { CustomSocket } from '../../typings/socket-types.ts';
-import WebSocketManager from '../managers/web-socket-manager.ts';
+import { CustomSocket } from '../../typings/socket-types';
+import WebSocketManager from '../managers/web-socket-manager';
 
 class EventHandler {
 

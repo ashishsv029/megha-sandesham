@@ -1,4 +1,4 @@
-import RoomDbAccessor from "../data-accessors/room-db-accessor.ts";
+import RoomDbAccessor from "../data-accessors/room-db-accessor";
 import {uniqueNamesGenerator, adjectives, colors, animals} from 'unique-names-generator'
 class RoomManager {
 

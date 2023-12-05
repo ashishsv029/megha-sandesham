@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import RoomManager from '../../managers/room-manager.ts';
-import MessageManager from '../../managers/message-manager.ts';
+import RoomManager from '../../managers/room-manager';
+import MessageManager from '../../managers/message-manager';
 
 class RoomRouteHandler {
     

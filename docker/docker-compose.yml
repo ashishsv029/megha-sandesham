@@ -1,0 +1,4 @@
+verison: 3
+services:
+    redis:
+      

@@ -18,7 +18,10 @@ class AppLoader {
 
     constructor() {
         this.config = {
-            appServerPort: 3000
+            appServerPort: 3000,
+            redis: {
+                connectionString: 'redis://172.17.0.2:6379' //replace with localhost when starting locally
+            }
 
         };
         this.dependencies = {};
@@ -46,7 +49,10 @@ class AppLoader {
     }
 
     async mountWebSocketServer() {
-        let redisClient = await createClient({ url: "redis://localhost:6379" }).on('error', err => console.log('Redis Client Error', err)).connect();
+        //while starting in local directly ensure replace 172.17.0.2 with localhost
+        // ideally this is not a good way to hard code redis ip as the containers ips are dynamic..
+        // so using custom netwrok is a good scalable solution
+        let redisClient = await createClient({ url: this.config.redis.connectionString }).on('error', err => console.log('Redis Client Error', err)).connect();
         this.dependencies.webSocketIOServer = new Server(this.dependencies.httpAppServer, {
             adapter: createAdapter(redisClient) // for facilitating communication bw clients connected to multiple ws servers
           });

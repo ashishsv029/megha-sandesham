@@ -20,7 +20,7 @@ class AppLoader {
         this.config = {
             appServerPort: 3000,
             redis: {
-                connectionString: 'redis://172.17.0.2:6379' //replace with localhost when starting locally
+                connectionString: 'redis://redis:6379'//'redis://172.17.0.2:6379' //replace with localhost when starting locally
             }
 
         };

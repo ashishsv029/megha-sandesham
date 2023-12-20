@@ -1,4 +1,36 @@
-verison: 3
+version: "3"
 services:
     redis:
+        image: redis:5.0
+        container_name: redis
+        networks:
+            - meghasandesham-main
+
+    postgres:
+        image: postgres:10.10
+        container_name: postgres
+        environment:
+            - POSTGRES_PASSWORD=password
+        networks:
+            - meghasandesham-main
+
+    app:
+        container_name: meghasandesham
+        build:
+            context: ../
+            dockerfile: ./docker/app/Dockerfile
+        depends_on:
+            - redis
+            - postgres
+        entrypoint: [] #["bash", "-c"]
+        command: dockerize -wait tcp://redis:6379 -wait tcp://postgres:5432 -timeout 50s bash -c "echo please create an app start script && chmod +x run-app.sh && sh run-app.sh && node dist/src/app.js"
+                #run a bash file which starts the app and the app's prerequisite command
+        restart: on-failure
+        networks:
+            - meghasandesham-main
+    
+networks:
+    meghasandesham-main:
+        driver: bridge
       
+

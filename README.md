@@ -8,3 +8,7 @@ V1.0.0
 
 # Running Tests
 1. npm run test - for running unit tests & code coverage report generation
+
+# Running Docker Compose
+    -> sudo docker compose -f docker/docker-compose.yml up --build
+    -> sudo docker compose -f docker/docker-compose.yml down

@@ -1,5 +1,6 @@
 # install linux os base image ex:- ubuntu. Later replace with a slim size linux distibution image
 # install node (npm also if not installed, install curl)
+# install dockerize
 # install typescript
 # install node modules
 # install prisma client 
@@ -9,8 +10,13 @@
 
 FROM ubuntu
 RUN apt-get update
-RUN apt-get install -y curl
+RUN apt-get install -y curl wget
 RUN apt install -y nodejs npm
+ENV DOCKERIZE_VERSION v0.6.0
+RUN wget --no-check-certificate https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+
 # change node version to 18.15.0  
 RUN npm i -g n \
     && n 18.15.0
@@ -31,13 +37,16 @@ COPY ./prisma/schema.prisma ./prisma/
 # this should be after copying the prisma schema, because the schema.prisma file changes very rarely and we can take layer optimization benefit  
 RUN npx prisma generate
 
-# so this below copy command is most probable to get changed and invalidate all the subsequent layered cache.. so keep at it as end (top layer) as possible
+# so this below copy command is most probable to get changed and invalidate all the subsequent layered cache.. so keep at it as end (top layer) as possible in the dockefile
 COPY . .
+
+RUN npx prisma generate
 
 #compile ts code and generate js build
 RUN tsc
 
 #this will fail because it needs dependent services (like redis and postgres) to be up before starting app.. so either this container should run after those container started.. use dockerize when automating while usig docker-compose
+#and also as we are specifying execution context as node using entrypoint this cant be changed while running container using overriden execution command
 ENTRYPOINT [ "node" ]
 CMD ["dist/src/app.js"] 
 # use what command the container should run while running the container. for ex:- docker run -it imageid/name /bin/bash -c "cd app && node dist/src/app.js" 

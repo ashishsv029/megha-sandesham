@@ -1,12 +1,16 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+//binaryTarget to specify the exact binary is needed when executing prisma commands on alpine linux
+//https://www.prisma.io/docs/orm/prisma-schema/overview/generators
+
 generator client {
   provider = "prisma-client-js"
   // for more details regarding the params see the user-db-accessor file
   maxPoolingConnections = 10
   minPoolingConnections = 2
   connectionTimeout = 30000
+  binaryTargets = ["native","linux-musl-openssl-3.0.x"]
 }
 
 datasource db {

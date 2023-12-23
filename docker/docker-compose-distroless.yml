@@ -30,7 +30,8 @@ services:
             context: ../
             #dockerfile: ./docker/app/Dockerfile
             #dockerfile: ./docker/app/multistage/Dockerfile
-            dockerfile: ./docker/app/multistage/minimalistic-base/Dockerfile
+            #dockerfile: ./docker/app/multistage/minimalistic-base/Dockerfile
+            dockerfile: ./docker/app/multistage/distroless-base/Dockerfile
             
             target: finalstage
 
@@ -39,8 +40,22 @@ services:
             - redis
             - postgres
         entrypoint: [] #["bash", "-c"]
-        command: dockerize -wait tcp://redis:6379 -wait tcp://postgres:5432 -timeout 50s bash -c "echo please create an app start script && chmod +x run-app.sh && sh run-app.sh"
+        #command: dockerize -wait tcp://redis:6379 -wait tcp://postgres:5432 -timeout 50s bash -c "echo please create an app start script && chmod +x run-app.sh && sh run-app.sh"
                 #run a bash file which starts the app and the app's prerequisite command
+
+        #for distroless images use sh instead of bash
+        command: 
+            - dockerize 
+            - -wait 
+            - tcp://redis:6379 
+            - -wait 
+            - tcp://postgres:5432 
+            - -timeout 
+            - 50s 
+            - /bin/sh 
+            - -c 
+            - "echo please create an app start script && chmod +x run-app-in-distroless-container.sh && echo which cmd using.. && which node && which prisma && ls /usr/local/bin && /usr/local/bin/prisma migrate status && ./run-app-in-distroless-container.sh"
+
         
         restart: on-failure
         networks:

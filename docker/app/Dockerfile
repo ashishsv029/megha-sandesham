@@ -9,8 +9,11 @@
 # execute cmd index.js in dist folder
 
 FROM ubuntu
-RUN apt-get update
-RUN apt-get install -y curl wget
+
+# RUN apt-get update actually -- this will be cached by docker and always uses the stale cache dependencies 
+# RUN apt-get install -y curl wget -- (so the problem is the local/cached repos point to older ips/outdated versions of the repos and if the repos ip changes and if we install it again, it try to contact old ip to fetch packages which will not be availble anymore)
+# the below line forces docker to invalidate the cache -- cache busting (but the problem here is, all the below layers cache also invalidates forcing all the commands to execute)
+RUN apt-get update && apt-get install -y curl wget
 RUN apt install -y nodejs npm
 ENV DOCKERIZE_VERSION v0.6.0
 RUN wget --no-check-certificate https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
@@ -32,10 +35,6 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 # here this step wont execute again and will take node modules content from build cache if the previous layer is not invalidated
 RUN npm install
-
-COPY ./prisma/schema.prisma ./prisma/
-# this should be after copying the prisma schema, because the schema.prisma file changes very rarely and we can take layer optimization benefit  
-RUN npx prisma generate
 
 # so this below copy command is most probable to get changed and invalidate all the subsequent layered cache.. so keep at it as end (top layer) as possible in the dockefile
 COPY . .

@@ -3,7 +3,7 @@ import IdentityManager from '../../managers/identity-manager';
 
 class IdentityRouteHandler {
     [key:string]:{}
-    identityManager:IdentityManager
+    private identityManager:IdentityManager
     constructor(dependencies:any, config:any) {
         this.identityManager = new IdentityManager(dependencies, config)
     }

@@ -1,7 +1,7 @@
 import express from 'express';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
-import { Dependencies } from '../typings/app-loader-types';
+import { CustomSocket } from '../typings/socket-types';
 import { PrismaClient } from '@prisma/client'
 import RegisterEvents from './events/register-events';
 import RegisterRoutes from './routes/register-routes';
@@ -13,7 +13,7 @@ class AppLoader {
     
     [key: string]: {}; // index signature for the current class which says the class which is nothing but an object should have any keys but values as objects
     dependencies:Dependencies
-    config:any
+    config:Config
 
 
     constructor() {
@@ -69,7 +69,7 @@ class AppLoader {
 
     registerWSMiddlewares() {
         const io = this.dependencies.webSocketIOServer;
-        io.use((socket:any, next:any)=>{
+        io.use((socket:CustomSocket, next:any):void=>{
             console.log('middleware');
             return next();
         }); //move to a seperate file

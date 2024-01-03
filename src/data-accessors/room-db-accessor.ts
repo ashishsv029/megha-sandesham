@@ -1,6 +1,6 @@
 class RoomDbAccessor {
     [key:string]:{}
-    prisma:any
+    private prisma:any
     constructor(dependencies:any, config:any) {
         this.prisma = dependencies.prisma
     }

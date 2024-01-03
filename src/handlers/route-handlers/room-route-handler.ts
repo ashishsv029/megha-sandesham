@@ -5,8 +5,8 @@ import MessageManager from '../../managers/message-manager';
 class RoomRouteHandler {
     
     [key:string]:{}
-    roomManager:RoomManager
-    messageManager:MessageManager
+    private roomManager:RoomManager
+    private messageManager:MessageManager
     constructor(dependencies:any, config:any) {
         this.roomManager = new RoomManager(dependencies, config);
         this.messageManager = new MessageManager(dependencies, config);

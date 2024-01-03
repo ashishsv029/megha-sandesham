@@ -1,10 +1,11 @@
 import RoomDbAccessor from "../data-accessors/room-db-accessor";
 import {uniqueNamesGenerator, adjectives, colors, animals} from 'unique-names-generator'
+//import {Config} from '../../typings/app-loader-types'
 class RoomManager {
 
     [key:string]:{}
-    roomDBAccessor: RoomDbAccessor
-    constructor(dependencies:any, config:any) {
+    private roomDBAccessor: RoomDbAccessor
+    constructor(dependencies:any, config:Config) {
         this.roomDBAccessor = new RoomDbAccessor(dependencies, config)
     }
 

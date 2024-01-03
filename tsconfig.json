@@ -1,11 +1,29 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "target": "es2020",
+    "target": "es2020", //compilating target
     "module": "CommonJS",                                /* Specify what module code is generated. */
     "moduleResolution": "node",
-    "sourceMap": true,
+    "sourceMap": true,                                   /*genertaes a source map file along with js file.. useful in browser envs.. this is useful to look at ts files instead of browser pointing to the compiled js file which is not very verbose enough*/             
     "outDir": "./dist",
-    "strict": true                                  /* Enable all strict type-checking options. */
+    "strict": true,                                      /* Enable all strict type-checking options. */
+    "noEmitOnError": true
   },
+  "include": [
+    "src/**/*.ts",
+    "typings/*.ts",
+    "typings/*.d.ts"
+  ],
+  "files": ["typings/global-types.d.ts",],             //this is needed to make sure that typescript includes this file also for compilation
+
 }
+  
+
+/*
+
+include vs files diff
+
+The include and files settings in the tsconfig.json file in TypeScript are related but serve slightly different purposes.
+-> The include setting is an array of file patterns that specifies which files TypeScript should include in the compilation process. Files matching the patterns specified in include are considered for compilation, and TypeScript will include them in the build, regardless of whether they are referenced in your code.
+-> The files setting is also an array, but it explicitly lists the files that TypeScript should include in the compilation process. Unlike include, which uses file patterns, files directly enumerates the files to be included.
+*/

@@ -2,21 +2,25 @@ import { Socket } from "socket.io";
 import RoomManager from "./room-manager"
 import IdentityManager from "./identity-manager";
 import MessageManager from "./message-manager";
-
+/// <reference path="../../global-types.d.ts" />
 interface Room {
     [key:string]: any;
 }
 class WebSocketManager {
 
     [key:string]:{}
-    roomManager:RoomManager
-    identityManager: IdentityManager
-    messageManager: MessageManager
-    constructor(dependencies:any, config:any) {
-        //orm object
-        this.identityManager = new IdentityManager(dependencies, config);
+    private roomManager:RoomManager
+    private _identityManager: IdentityManager
+    public messageManager: MessageManager
+    constructor(dependencies:Dependencies, config:Config) {
+        this._identityManager = new IdentityManager(dependencies, config);
         this.roomManager = new RoomManager(dependencies, config);
         this.messageManager = new MessageManager(dependencies, config);
+    }
+
+    //for unit testing purpose
+    get identityManager():IdentityManager {
+        return this._identityManager;
     }
 
     async createGroup(payload:any) {
@@ -36,7 +40,7 @@ class WebSocketManager {
 
 
     async fetchRoomsAssociatedToUser(userInfo:any) {
-        return await this.identityManager.fetchRoomsByUserId(userInfo.id);   
+        return await this._identityManager.fetchRoomsByUserId(userInfo.id);   
     }
 
     async addUserIntoRooms(socket:Socket, userInfo:any) {
@@ -59,7 +63,7 @@ class WebSocketManager {
         }
     }
 
-    enrichMessage(data:any, storedMessage:any) {
+    private enrichMessage(data:any, storedMessage:any) {
         let messagePayload = {
             from: data.caller_socket_user_info.name,
             message: data.message,

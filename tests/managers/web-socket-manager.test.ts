@@ -18,7 +18,13 @@ describe('Web Socket Manager Test suite', () => {
             }
 
         };
-        webSocketManagerMock = new WebSocketManager({}, {});
+        webSocketManagerMock = new WebSocketManager({}, { //replace with a test config
+            appServerPort: 3000,
+            redis: {
+                connectionString: 'redis://localhost:6379'
+            }
+
+        });
 
     })
     it('verify send message that emits chat-message event - positive flow', async () => {

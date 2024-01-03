@@ -3,7 +3,7 @@ import MessageDbAccessor from "../data-accessors/message-db-accessor";
 
 class MessageManager {
     [key:string]: any
-    messageDbAccessor: MessageDbAccessor
+    private messageDbAccessor: MessageDbAccessor
     constructor(dependencies:any, config:any) {
         this.messageDbAccessor = new MessageDbAccessor(dependencies, config);
     }

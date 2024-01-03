@@ -7,11 +7,11 @@ import { CustomSocket } from '../../typings/socket-types';
 class RegisterEvents {
 
     [key: string]: {}
-    eventHandler: EventHandler;
-    io: any //TODO:- check types lib of io and copy the type declaration of io and paste here instead of any
+    private eventHandler: EventHandler;
+    private io: any //TODO:- check types lib of io and copy the type declaration of io and paste here instead of any
     
     
-    constructor(dependencies:any, config:any) {
+    constructor(dependencies:Dependencies, config:Config) {
         this.eventHandler = new EventHandler(dependencies, config);
         this.io = dependencies.webSocketIOServer;
     }

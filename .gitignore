@@ -4,3 +4,4 @@ monolithcode.js
 .env
 coverage
 .nyc_output
+todos.txt

@@ -3,16 +3,19 @@
 
 import EventHandler from '../handlers/event-handler'
 import { CustomSocket } from '../../typings/socket-types';
+import { Inject } from 'typescript-ioc';
 
 class RegisterEvents {
 
     [key: string]: {}
-    private eventHandler: EventHandler;
+    
     private io: any //TODO:- check types lib of io and copy the type declaration of io and paste here instead of any
+
+    @Inject
+    private eventHandler: EventHandler;
     
     
     constructor(dependencies:Dependencies, config:Config) {
-        this.eventHandler = new EventHandler(dependencies, config);
         this.io = dependencies.webSocketIOServer;
     }
 

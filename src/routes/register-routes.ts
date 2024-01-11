@@ -3,18 +3,21 @@
 import IdentityRouteHandler from '../handlers/route-handlers/identity-route-handler'
 import RoomRouteHandler from '../handlers/route-handlers/room-route-handler'
 import { Express } from 'express'
+import { Inject, Container } from 'typescript-ioc'
 /// <reference path="../../typings/global-types.d.ts" />
 class RegisterRoutes {
     
     [key:string]:{}
     private app: Express //TOdo:- assign the correct type defination for app
-    private identityRouteHandler:IdentityRouteHandler
-    private roomRouteHandler:RoomRouteHandler
+    
+    @Inject
+    private identityRouteHandler!:IdentityRouteHandler
+    
+    @Inject
+    private roomRouteHandler!:RoomRouteHandler
     
     constructor(dependencies:any, config:Config) {
         this.app = dependencies.app
-        this.identityRouteHandler = new IdentityRouteHandler(dependencies, config);
-        this.roomRouteHandler = new RoomRouteHandler(dependencies, config);
     }
 
     register() {

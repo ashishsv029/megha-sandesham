@@ -7,7 +7,10 @@
     "sourceMap": true,                                   /*genertaes a source map file along with js file.. useful in browser envs.. this is useful to look at ts files instead of browser pointing to the compiled js file which is not very verbose enough*/             
     "outDir": "./dist",
     "strict": true,                                      /* Enable all strict type-checking options. */
-    "noEmitOnError": true
+    "noEmitOnError": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false
   },
   "include": [
     "src/**/*.ts",

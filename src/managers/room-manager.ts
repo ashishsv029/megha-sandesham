@@ -1,13 +1,15 @@
+import { Inject } from "typescript-ioc";
 import RoomDbAccessor from "../data-accessors/room-db-accessor";
 import {uniqueNamesGenerator, adjectives, colors, animals} from 'unique-names-generator'
 //import {Config} from '../../typings/app-loader-types'
 class RoomManager {
 
     [key:string]:{}
+
+    @Inject
     private roomDBAccessor: RoomDbAccessor
-    constructor(dependencies:any, config:Config) {
-        this.roomDBAccessor = new RoomDbAccessor(dependencies, config)
-    }
+    
+    constructor(dependencies:any, config:Config) {}
 
     generateRoomPayload(inputPayload:any) {
         const roomPayload:any = {

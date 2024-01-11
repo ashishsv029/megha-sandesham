@@ -1,12 +1,14 @@
+import { Inject } from "typescript-ioc";
 import MessageDbAccessor from "../data-accessors/message-db-accessor";
 
 
 class MessageManager {
     [key:string]: any
+
+    @Inject
     private messageDbAccessor: MessageDbAccessor
-    constructor(dependencies:any, config:any) {
-        this.messageDbAccessor = new MessageDbAccessor(dependencies, config);
-    }
+    
+    constructor(dependencies:any, config:any) {}
 
     generateMessagePayload(payload:any) {
         let messagePayload:any = {

@@ -1,16 +1,17 @@
 import { Request, Response } from 'express';
 import RoomManager from '../../managers/room-manager';
 import MessageManager from '../../managers/message-manager';
-
+import { Inject } from 'typescript-ioc';
 class RoomRouteHandler {
     
     [key:string]:{}
+    @Inject
     private roomManager:RoomManager
+
+    @Inject
     private messageManager:MessageManager
-    constructor(dependencies:any, config:any) {
-        this.roomManager = new RoomManager(dependencies, config);
-        this.messageManager = new MessageManager(dependencies, config);
-    }
+    
+    constructor(dependencies:any, config:any) {}
 
     getRoom(req: Request, res: Response) {
         try {

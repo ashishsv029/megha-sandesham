@@ -2,6 +2,8 @@ import { Socket } from "socket.io";
 import RoomManager from "./room-manager"
 import IdentityManager from "./identity-manager";
 import MessageManager from "./message-manager";
+import {UserInfo, CallerSocketUserInfo, AssociatedRoomsOfUser} from "../../typings/handlers/event-handler-types"
+import { Inject } from "typescript-ioc";
 /// <reference path="../../global-types.d.ts" />
 interface Room {
     [key:string]: any;
@@ -9,14 +11,16 @@ interface Room {
 class WebSocketManager {
 
     [key:string]:{}
+    @Inject
     private roomManager:RoomManager
+
+    @Inject
     private _identityManager: IdentityManager
+
+    @Inject
     public messageManager: MessageManager
-    constructor(dependencies:Dependencies, config:Config) {
-        this._identityManager = new IdentityManager(dependencies, config);
-        this.roomManager = new RoomManager(dependencies, config);
-        this.messageManager = new MessageManager(dependencies, config);
-    }
+
+    constructor(dependencies:Dependencies, config:Config) {}
 
     //for unit testing purpose
     get identityManager():IdentityManager {
@@ -39,11 +43,11 @@ class WebSocketManager {
     }
 
 
-    async fetchRoomsAssociatedToUser(userInfo:any) {
+    async fetchRoomsAssociatedToUser(userInfo:CallerSocketUserInfo) {
         return await this._identityManager.fetchRoomsByUserId(userInfo.id);   
     }
 
-    async addUserIntoRooms(socket:Socket, userInfo:any) {
+    async addUserIntoRooms(socket:Socket, userInfo:CallerSocketUserInfo) {
         const associatedRoomsOfUser = await this.fetchRoomsAssociatedToUser(userInfo);
         const associatedRoomIds:string[] = associatedRoomsOfUser.associatedRooms.map((room:Room) => room.id);
         associatedRoomIds.forEach((roomId:string) => {
@@ -54,7 +58,7 @@ class WebSocketManager {
         return associatedRoomsOfUser;
     }
 
-    async fetchUndeliveredMessages(socket:Socket, userWithRoomsInfo:any) {
+    async fetchUndeliveredMessages(socket:Socket, userWithRoomsInfo:AssociatedRoomsOfUser) {
         const associatedRoomIds:string[] = userWithRoomsInfo.associatedRooms.map((room:Room) => room.id);
         const unDeliveredMessagesForUserPerRoom:any = await this.messageManager.fetchUndeliveredMessagesOfUser(associatedRoomIds)
         for(let i = 0; i < unDeliveredMessagesForUserPerRoom.length; i++) {
@@ -75,6 +79,7 @@ class WebSocketManager {
     }
 
     async sendMessage(socket:Socket, data:any, ack:any) {
+        console.log("calling", this.messageManager);
         if(!data.room_id) {
             socket.emit('error', 'Room id not available...');
             socket.disconnect();

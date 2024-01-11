@@ -1,20 +1,21 @@
 import { CustomSocket } from '../../typings/socket-types';
 import WebSocketManager from '../managers/web-socket-manager';
-
+import {UserInfo, AssociatedRoomsOfUser, MessagePayload} from '../../typings/handlers/event-handler-types';
+import { Inject } from 'typescript-ioc';
 class EventHandler {
 
     [key:string]: any
     io:any
     connectedSockets:Set<string>
+
+    @Inject
     webSocketManager:WebSocketManager
     constructor(dependencies:any, config:any) {
         this.io = dependencies.webSocketIOServer
         this.connectedSockets = new Set<string>();
-        this.webSocketManager = new WebSocketManager(dependencies, config)
-
     }
 
-    chatMessageHandler(socket: CustomSocket, data: any, ack:any):void {
+    chatMessageHandler(socket: CustomSocket, data: MessagePayload, ack:any):void {
         data = this.enrichPayloadWithHeaderInfo(socket, data);
         this.webSocketManager.sendMessage(socket, data, ack);
     }
@@ -35,8 +36,8 @@ class EventHandler {
             this.io.emit('socket-pool-size-changed', this.connectedSockets.size) //handler should be in client code
             //assume sso gave u the details of the connected socket (like name, userid) in header
             //ideally the below block is not correct bcs this is a handler after connection is established, ideally if no header is there connection itself should not be validated
-            let userInfo = this.enrichPayloadWithHeaderInfo(socket);
-            const associatedRoomsOfUser = await this.webSocketManager.addUserIntoRooms(socket, userInfo.caller_socket_user_info);
+            let userInfo:UserInfo = this.enrichPayloadWithHeaderInfo(socket);
+            const associatedRoomsOfUser:AssociatedRoomsOfUser = await this.webSocketManager.addUserIntoRooms(socket, userInfo.caller_socket_user_info);
             // fetch and emit(self) all the message sent to this socket by various other sockets (in different rooms), when this socket is not connected
             await this.webSocketManager.fetchUndeliveredMessages(socket, associatedRoomsOfUser);
             //call websocketmanager to handle the rest of on socket connection processing i.e mainly joining

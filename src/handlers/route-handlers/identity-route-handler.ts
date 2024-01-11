@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 import IdentityManager from '../../managers/identity-manager';
+import {Inject} from "typescript-ioc"
 
 class IdentityRouteHandler {
     [key:string]:{}
-    private identityManager:IdentityManager
-    constructor(dependencies:any, config:any) {
-        this.identityManager = new IdentityManager(dependencies, config)
-    }
+    
+    @Inject
+    private identityManager!:IdentityManager
+
+    constructor(dependencies:any, config:any) {}
 
     getUser(req: Request, res: Response) {
         try {

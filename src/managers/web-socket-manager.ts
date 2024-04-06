@@ -79,7 +79,6 @@ class WebSocketManager {
     }
 
     async sendMessage(socket:Socket, data:any, ack:any) {
-        console.log("calling", this.messageManager);
         if(!data.room_id) {
             socket.emit('error', 'Room id not available...');
             socket.disconnect();

@@ -6,7 +6,9 @@ class RoomRouteHandler {
     
     [key:string]:{}
     @Inject
-    private roomManager:RoomManager
+    private roomManager:RoomManager 
+    //Here the type we defined is actually of concrete implementation's.. but it should be of an abstract type's 
+    // The actual dependency pattern itself says to use the reference of Abstract class here to support changing of the concrete impelementations dynamically
 
     @Inject
     private messageManager:MessageManager

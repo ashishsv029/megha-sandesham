@@ -1,3 +1,4 @@
+# TODOS
 # install linux os base image ex:- ubuntu. Later replace with a slim size linux distibution image
 # install node (npm also if not installed, install curl)
 # install dockerize

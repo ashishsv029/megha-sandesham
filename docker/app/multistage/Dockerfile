@@ -31,6 +31,8 @@ COPY --from=base /app/prisma /app/prisma/
 COPY --from=base /app/run-app.sh run-app.sh
 COPY --from=base /app/node_modules node_modules
 COPY --from=base /app/dist dist
+COPY --from=base /app/configs dist/configs/
+# the above step is done explicitely because, the dist folder wont contain non compiled files (i.e untracked ts files) , so we need to move this manually to the dist folder as the app runner tries to read the config file
 COPY --from=base /usr/local/bin/dockerize /usr/local/bin/dockerize
 ENTRYPOINT [ "node" ]
 CMD ["dist/src/app.js"]  

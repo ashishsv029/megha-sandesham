@@ -29,10 +29,10 @@ services:
         build:
             context: ../
             #dockerfile: ./docker/app/Dockerfile
-            #dockerfile: ./docker/app/multistage/Dockerfile
-            dockerfile: ./docker/app/multistage/minimalistic-base/Dockerfile
+            dockerfile: ./docker/app/multistage/Dockerfile
+            #dockerfile: ./docker/app/multistage/minimalistic-base/Dockerfile
             
-            target: finalstage
+            target: finalstage #this is not present in plain Dockerfile
 
 
         depends_on:

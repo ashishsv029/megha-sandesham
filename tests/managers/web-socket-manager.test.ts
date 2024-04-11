@@ -19,7 +19,7 @@ describe('Web Socket Manager Test suite', () => {
 
         };
         webSocketManagerMock = new WebSocketManager({}, { //replace with a test config
-            appServerPort: 3000,
+            appServerPort: 3100,
             redis: {
                 connectionString: 'redis://localhost:6379'
             }

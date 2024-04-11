@@ -20,8 +20,9 @@ export type MessagePayload = {
     message: string,
     room_id: string,
     time: Date,
+    receiver_name?: string,
     is_new_dm?: boolean,
-    caller_socker_user_info?: CallerSocketUserInfo
+    caller_socket_user_info?: CallerSocketUserInfo
 }
 
 type Room = {

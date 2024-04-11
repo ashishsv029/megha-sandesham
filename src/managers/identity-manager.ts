@@ -21,6 +21,16 @@ class IdentityManager {
         }
     }
 
+    async fetchUserByEmailIdAndName(payload:any) {
+        try {
+
+            return await this.userDBAccessor.getUser(payload);
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async fetchRoomsByUserId(userId:string) {
         try {
             return await this.userDBAccessor.fetchRoomsByUserId(userId);

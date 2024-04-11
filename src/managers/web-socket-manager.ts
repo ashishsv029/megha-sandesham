@@ -11,6 +11,7 @@ interface Room {
 class WebSocketManager {
 
     [key:string]:{}
+    private io: any
     @Inject
     private roomManager:RoomManager
 
@@ -20,7 +21,9 @@ class WebSocketManager {
     @Inject
     public messageManager: MessageManager
 
-    constructor(dependencies:Dependencies, config:Config) {}
+    constructor(dependencies:Dependencies, config:Config) {
+        this.io = dependencies.webSocketIOServer
+    }
 
     //for unit testing purpose
     get identityManager():IdentityManager {
@@ -52,9 +55,9 @@ class WebSocketManager {
         const associatedRoomIds:string[] = associatedRoomsOfUser.associatedRooms.map((room:Room) => room.id);
         associatedRoomIds.forEach((roomId:string) => {
             socket.join(roomId);
-            socket.emit('room-joined', roomId);
+            //socket.emit('room-joined', roomId);
         })
-        socket.emit('response', associatedRoomsOfUser)
+        socket.emit('response', {...associatedRoomsOfUser, response_type:'associatedRoomsOfUserInfo'})
         return associatedRoomsOfUser;
     }
 
@@ -63,16 +66,25 @@ class WebSocketManager {
         const unDeliveredMessagesForUserPerRoom:any = await this.messageManager.fetchUndeliveredMessagesOfUser(associatedRoomIds)
         for(let i = 0; i < unDeliveredMessagesForUserPerRoom.length; i++) {
             let message = unDeliveredMessagesForUserPerRoom[i]
-            socket.emit('chat-message', true, message, () => this.updateMessageAcknowledgements(message.id))
+            socket.emit('undelivered-message', message, () => this.updateMessageAcknowledgements(message.id))
+            //change the event value to undelivered-message and in client catch it and update count of these meesages on from user id
+            // in the event handler in client, also fire a event called message-acks, just like chat-message handler
         }
     }
 
-    private enrichMessage(data:any, storedMessage:any) {
+    private enrichMessage(storedMessage:any, data:any) {
+        console.log('storedMessage->', storedMessage);
         let messagePayload = {
-            from: data.caller_socket_user_info.name,
-            message: data.message,
-            time: data.time,
-            id: storedMessage.id
+            fromUser: {
+                id: storedMessage.fromUser.id,
+                name: storedMessage.fromUser.name
+            },
+            created_at: storedMessage.created_at,
+            text: storedMessage.text,
+            id: storedMessage.id,
+            delivered_at: storedMessage.delivered_at,
+            seen_at: storedMessage.seen_at,
+            isUserMessage: data.caller_socket_user_info.id == storedMessage.fromUser.id ? true : false
         };
         
         return messagePayload;
@@ -85,12 +97,12 @@ class WebSocketManager {
             return;
         }
         let message:any = await this.messageManager.storeMessage(data); //message gets created in db
-        ack({is_sent: true}); //emits same event back i.e socket.emit('chat-message', <list of sent arguments>)
+        //ack({is_sent: true}); //emits same event back i.e socket.emit('chat-message', <list of sent arguments>)
         // there is no support of callbacks while emitting to rooms.. 
         // ideally the callbacks are only useful when the server want to talk back to same socket who fired that event.. in this case it is not possible for room
         // socket.broadcast.to(data.room_id).emit('chat-message', true, messagePayload, () => this.updateMessageAcknowledgements(message.id));
-        let messagePayload = this.enrichMessage(data, message);
-        socket.broadcast.to(data.room_id).emit('chat-message', true, messagePayload);
+        let messagePayload = this.enrichMessage(message, data);
+        this.io.to(data.room_id).emit('chat-message', messagePayload);
     }
 
 

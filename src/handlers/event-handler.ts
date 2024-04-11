@@ -22,16 +22,26 @@ class EventHandler {
         if(data.is_new_dm) {
             let receiverId:string = data.room_id;
             //create a new room and add current user and receiver user whose id is being sent in room_id field
-            let room = await this.createGroupHandler(socket, {
+            let roomPayload:any =  {
                 type: 'dm',
                 initial_room_members: [
                     {"id": receiverId}
                 ]
-            });
+            }
+            if(data.caller_socket_user_info?.name && data.receiver_name) {
+                roomPayload.name = `${data.caller_socket_user_info?.name}:${data.receiver_name}` //User not allowed to update his name anymore once created
+            } else {
+                socket.emit('error', 'Missing sender name / receiver name');
+                return;
+                //throw new Error('Missing sender name / receiver name'); - crashing server and restarts
+            }
+            let room = await this.createGroupHandler(socket,roomPayload);
             //replace receiver id in room id field with the newly created room_id
             data.room_id = room.id;
         }
         await this.webSocketManager.sendMessage(socket, data, ack);
+        // if its a dm and the receiver socket is connected to the web server, the recievr socket fires a message-acks event with message id for all the fired chat-message events from sender sockets
+        // so the message delivery status is controlled by client firing message-acks event
     }
 
     enrichPayloadWithHeaderInfo(socket:CustomSocket, payload:any = {}) {
@@ -109,13 +119,15 @@ class EventHandler {
             let receiverId = roomMembersExceptAdmin[i];
             let receiverSocketId = this.connectedSockets.get(receiverId);
             let receiverSocket:CustomSocket;
-            // if the reciever is  live i.e connected to websocker server
+            // if the reciever is  live i.e connected to websocket server
             //join the receievrSocket into the room in realtime
             // let socketsOnIo = await this.io.fetchSockets();
             // console.log("fetching required recievr socket instance" , socketsOnIo.filter((sock:any) => sock.id == receiverSocketId));
             if(receiverSocketId) {
                 receiverSocket = this.io.sockets.sockets.get(receiverSocketId); //TODO:- change it to using await fetchSockets() as it works with multiple Socket.IO servers, hence the await operator.
                 receiverSocket.join(group.id);
+                console.log("emitting room joined event to receiver socket")
+                receiverSocket.emit('room-joined', group)
             }
         }
         if(group.type == 'group') {
@@ -123,7 +135,7 @@ class EventHandler {
             socket.emit('chat-message', `you are the admin`) //self emit
             socket.broadcast.to(group.id).emit('chat-message', `you are added to the group by ${group.roomAdmin.name}`) //emit to all other memebers who joined the group
         }
-        socket.emit('response', group) //optional
+        //socket.emit('response', group) //optional
         return group;
 
     }

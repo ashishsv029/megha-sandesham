@@ -10,11 +10,18 @@ class IdentityRouteHandler {
 
     constructor(dependencies:any, config:any) {}
 
-    getUser(req: Request, res: Response) {
+    async getUser(req: Request, res: Response) {
         try {
-
+            const payload = {
+                email: req.query.email,
+                name: req.query.name
+            }
+            console.log(payload)
+            const fetchedUser = await this.identityManager.fetchUserByEmailIdAndName(payload);
+            res.status(200).json(fetchedUser)
         } catch(err) {
-
+            console.log("err--", err)
+            res.status(400).send('Invalid Request - ' + JSON.stringify(err))
         }
     }
 

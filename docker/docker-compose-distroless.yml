@@ -61,7 +61,7 @@ services:
         networks:
             - meghasandesham-main
         ports:
-            - 3000:3000
+            - 3100:3100
     
 networks:
     meghasandesham-main:

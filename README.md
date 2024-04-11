@@ -1,6 +1,17 @@
 # megha-sandesham
 V1.0.0
 
+## Available Features
+1. User Signup/Signin
+2. DM chat (with acknowledgement support i.e delivered, read and seen)
+3. Group chat
+
+
+## Planned Features
+1. Message delivery scheduling
+2. Image sharing
+
+
 ## Libraries Used
 1. Express 
 2. Socket.IO

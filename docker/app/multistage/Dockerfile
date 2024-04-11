@@ -8,7 +8,7 @@ RUN wget --no-check-certificate https://github.com/jwilder/dockerize/releases/do
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 RUN npm i -g n \
-    && n 18.15.0
+    && n v18.15.0
 RUN npm i -g typescript
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -22,7 +22,7 @@ RUN tsc
 
 FROM ubuntu as finalstage
 RUN apt-get update && apt-get install -y curl nodejs npm
-RUN npm i -g n && n 18.15.0
+RUN npm i -g n && n v18.15.0
 WORKDIR /app
 # before runnig app, we need to copy tsc compiled dist folder, node_modules, dockerize file and copy into /usr/local/bin
 # in our dockerfile there are less artifacts (like executables, binaries etc.. ) so the finalstage image size will be just somewhat smaller than original single stage image

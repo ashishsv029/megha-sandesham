@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { CustomSocket } from '../typings/socket-types';
@@ -68,8 +69,12 @@ class AppLoader {
         // so using custom netwrok is a good scalable solution
         let redisClient = await createClient({ url: this.config.redis.connectionString }).on('error', err => console.log('Redis Client Error', err)).connect();
         this.dependencies.webSocketIOServer = new Server(this.dependencies.httpAppServer, {
+            cors: {
+                origin: "http://localhost:3000" // allow requests from react app - only while local testing
+            },
             adapter: createAdapter(redisClient) // for facilitating communication bw clients connected to multiple ws servers
-          });
+            
+        });
 
     }
 
@@ -78,6 +83,7 @@ class AppLoader {
         //app.use(express.static(new URL('../public', import.meta.url).pathname)); //middleware
         app.use(express.static(path.join(__dirname, 'public'))); //middleware
         app.use(express.json()) // body parser middleware
+        app.use(cors())
         this.dependencies.prisma = new PrismaClient();
     }
 

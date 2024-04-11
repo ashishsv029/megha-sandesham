@@ -1,3 +1,3 @@
-appServerPort: 3000
+appServerPort: 3100
 redis:
   connectionString: 'redis://redis:6379'  # //'redis://172.17.0.2:6379' //replace with localhost when starting locally

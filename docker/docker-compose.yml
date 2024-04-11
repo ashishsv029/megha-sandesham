@@ -39,14 +39,14 @@ services:
             - redis
             - postgres
         entrypoint: [] #["bash", "-c"]
-        command: dockerize -wait tcp://redis:6379 -wait tcp://postgres:5432 -timeout 50s bash -c "echo please create an app start script && chmod +x run-app.sh && sh run-app.sh"
+        command: dockerize -wait tcp://redis:6379 -wait tcp://postgres:5432 -timeout 120s bash -c "echo please create an app start script && chmod +x run-app.sh && sh run-app.sh"
                 #run a bash file which starts the app and the app's prerequisite command
         
         restart: on-failure
         networks:
             - meghasandesham-main
         ports:
-            - 3000:3000
+            - 3100:3100
     
 networks:
     meghasandesham-main:

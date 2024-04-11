@@ -41,8 +41,19 @@ class RoomRouteHandler {
 
     async getMessagesOfRoom(req: Request, res: Response) {
         try {
+            const callerInfoHeader:any = req.headers['x-ms-user-info'];
+            if(!callerInfoHeader) {
+                res.status(400).send('Invalid Operation')
+            }
+            const callerInfo = JSON.parse(callerInfoHeader);
             const roomId = req.params.roomId;
+
             const roomMessages = await this.messageManager.getMessagesOfRoom(roomId);
+            roomMessages.forEach((message:any) => {
+                if(message.fromUser.id == callerInfo.id) {
+                    message.isUserMessage = true;
+                }
+            })
             res.status(200).json(roomMessages)
         } catch (err) {
             console.log(err);

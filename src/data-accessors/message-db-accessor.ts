@@ -82,7 +82,8 @@ class MessageDbAccessor {
                     seen_at: true,
                     fromUser: {
                         select: {
-                            name: true
+                            name: true,
+                            id: true
                         }
                     }
                 }

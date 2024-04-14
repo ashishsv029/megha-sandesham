@@ -19,6 +19,12 @@ class EventHandler {
 
     async chatMessageHandler(socket: CustomSocket, data: MessagePayload, ack:any):Promise<void> {
         data = this.enrichPayloadWithHeaderInfo(socket, data);
+        if(data.scheduled_time) {
+            socket.emit('chat-message', this.webSocketManager.enrichMessage({}, data) );
+            return; //will not be delivered to the receiver straight away
+            //TODO: the message  delivery details (receiver room id, schedule details, status) are to be stored in different table with message_id as foreign key
+            //TODO: A cron job which runs every one hour picks up based on status, call the chatMessageHandler with same payloads
+        }
         if(data.is_new_dm) {
             let receiverId:string = data.room_id;
             //create a new room and add current user and receiver user whose id is being sent in room_id field
@@ -37,6 +43,7 @@ class EventHandler {
             }
             let room = await this.createGroupHandler(socket,roomPayload);
             //replace receiver id in room id field with the newly created room_id
+            data.temp_room_id = data.room_id;
             data.room_id = room.id;
         }
         await this.webSocketManager.sendMessage(socket, data, ack);

@@ -19,6 +19,8 @@ export interface AssociatedRoomsOfUser {
 export type MessagePayload = {
     message: string,
     room_id: string,
+    temp_room_id?: string
+    scheduled_time?:string
     time: Date,
     receiver_name?: string,
     is_new_dm?: boolean,

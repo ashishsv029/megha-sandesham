@@ -72,21 +72,27 @@ class WebSocketManager {
         }
     }
 
-    private enrichMessage(storedMessage:any, data:any) {
+    enrichMessage(storedMessage:any, data:any) {
         console.log('storedMessage->', storedMessage);
-        let messagePayload = {
+        let messagePayload:any = {
             fromUser: {
-                id: storedMessage.fromUser.id,
-                name: storedMessage.fromUser.name
+                id: storedMessage.fromUser?.id || data.caller_socket_user_info?.id,
+                name: storedMessage.fromUser?.name || data.caller_socket_user_info?.name
             },
-            created_at: storedMessage.created_at,
-            text: storedMessage.text,
+            created_at: storedMessage.created_at || new Date().toISOString(),
+            text: storedMessage.text || data.message,
             id: storedMessage.id,
-            delivered_at: storedMessage.delivered_at,
+            delivered_at: storedMessage.delivered_at || new Date().toISOString(),
             seen_at: storedMessage.seen_at,
-            isUserMessage: data.caller_socket_user_info.id == storedMessage.fromUser.id ? true : false
+            isUserMessage: true,
+            deliverable_room_id: data.room_id,
         };
-        
+        if(data.temp_room_id) {
+            messagePayload.temp_room_id = data.temp_room_id;
+        }
+        if(data.scheduled_time) {
+            messagePayload.text = messagePayload.text + '\n' + 'will be delivered on ' + data.scheduled_time
+        }
         return messagePayload;
     }
 
@@ -96,12 +102,13 @@ class WebSocketManager {
             socket.disconnect();
             return;
         }
-        let message:any = await this.messageManager.storeMessage(data); //message gets created in db
+        let message:any =  await this.messageManager.storeMessage(data); //message gets created in db
         //ack({is_sent: true}); //emits same event back i.e socket.emit('chat-message', <list of sent arguments>)
         // there is no support of callbacks while emitting to rooms.. 
         // ideally the callbacks are only useful when the server want to talk back to same socket who fired that event.. in this case it is not possible for room
         // socket.broadcast.to(data.room_id).emit('chat-message', true, messagePayload, () => this.updateMessageAcknowledgements(message.id));
-        let messagePayload = this.enrichMessage(message, data);
+        let messagePayload:any = this.enrichMessage(message, data);
+        messagePayload.deliverable_room_id = data.room_id;
         this.io.to(data.room_id).emit('chat-message', messagePayload);
     }
 

@@ -25,6 +25,7 @@ class RegisterRoutes {
         this.app.get('/user', this.identityRouteHandler.getUser.bind(this.identityRouteHandler));
         this.app.post('/room', this.roomRouteHandler.createRoom.bind(this.roomRouteHandler)); // for new group creation
         this.app.get('/room/:roomId/messages', this.roomRouteHandler.getMessagesOfRoom.bind(this.roomRouteHandler))
+        this.app.get('/user/:name', this.identityRouteHandler.getUserByName.bind(this.identityRouteHandler));
     }
 
 

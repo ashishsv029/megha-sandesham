@@ -39,6 +39,22 @@ class UserDbAccessor {
         }
     }
 
+    async getUserByName(payload:any) {
+        try {
+            const newUser = await this.prisma.user.findFirst({
+               where: {
+                name: payload.name
+               }
+              });
+            return newUser;
+        } catch (err) {
+            console.log(err);
+            throw err;
+        } finally {
+            await this.prisma.$disconnect();
+        }
+    }
+
     async fetchRoomsByUserId(userId:string) {
         try {
             return await this.prisma.user.findUnique({

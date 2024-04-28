@@ -67,13 +67,15 @@ class AppLoader {
         //while starting in local directly ensure replace 172.17.0.2 with localhost
         // ideally this is not a good way to hard code redis ip as the containers ips are dynamic..
         // so using custom netwrok is a good scalable solution
-        let redisClient = await createClient({ url: this.config.redis.connectionString }).on('error', err => console.log('Redis Client Error', err)).connect();
+        let redisClient = await createClient({ 
+            url: this.config.redis.connectionString 
+        }).on('error', err => console.log('Redis Client Error', err)).connect();
         this.dependencies.webSocketIOServer = new Server(this.dependencies.httpAppServer, {
             cors: {
                 origin: "http://localhost:3000" // allow requests from react app - only while local testing
             },
             adapter: createAdapter(redisClient) // for facilitating communication bw clients connected to multiple ws servers
-            
+            // Read this:- https://socket.io/docs/v4/redis-streams-adapter/ 
         });
 
     }

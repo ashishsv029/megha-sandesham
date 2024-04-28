@@ -33,6 +33,11 @@ V1.0.0
     using minimalistic linux base i.e alpine base image the final app image size reduce to ~ 605MB
     using distroless base image the final app image size is reducing till ~400MB (but some issues while spinning up the contianer.. so dont use this till updated here, use the minimialist image for now)
 
+# Schema Design Doc
+
+![MeghaSandeshamSchemaDesign](https://github.com/ashishsv029/megha-sandesham/blob/master/public/readme_images/MeghaSandesham.png)
+
+
 # Todos:-
 
 1. Add cron handling for all scheduled messages - change UI of the scheduled messages

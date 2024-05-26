@@ -21,9 +21,38 @@ class RegisterEvents {
 
 
     register() {
-        this.io.on('connection', (socket:CustomSocket):void => {
+        this.io.on('connection', async (socket:CustomSocket):Promise<void> => {
             //validate whether the connection is authenticated or not
-            console.log(socket.handshake.headers)
+            // Validate the jwt using the authentication service client
+            // On successful validation, remove the authorization header and attach x-ms-user-info header in socket.handshake.headers 
+            try {
+                let jwt:string = socket.handshake.headers['authorization'] || '';
+                if( jwt == '' ){
+                    throw 'Invalid JWT';
+                }
+                const response = await fetch('http://localhost:3200/user/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                       jwt: jwt
+                    })
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const claimsData = await response.json();
+                socket.handshake.headers['x-ms-user-info'] = JSON.stringify({
+                    id: claimsData.user_id,
+                    name: claimsData.user_name
+                });
+                console.log(claimsData);
+            } catch (err) {
+                throw 'Invalid JWT';
+            }
+            console.log("Connection Established...", );
             this.registerSocketEvents(socket)
             this.eventHandler.connectionHandler(socket)
         });

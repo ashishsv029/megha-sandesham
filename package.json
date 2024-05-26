@@ -5,6 +5,7 @@
   "main": "dist/app.js",
   "scripts": {
     "start": "tsc && npm run copy-files && node dist/src/app.js",
+    "start-debug": "tsc && npm run copy-files && node --inspect dist/src/app.js",
     "copy-files": "cp -r configs dist/",
     "dev": "nodemon --exec 'ts-node-esm' src/app.ts",
     "test": "nyc --reporter=lcov --reporter=text-summary mocha --exit",

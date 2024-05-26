@@ -2,17 +2,53 @@ import { CustomSocket } from '../../typings/socket-types';
 import WebSocketManager from '../managers/web-socket-manager';
 import {UserInfo, AssociatedRoomsOfUser, MessagePayload} from '../../typings/handlers/event-handler-types';
 import { Inject } from 'typescript-ioc';
+
+class ActiveSockets { //Should have an implementation similar to Map
+
+    redisClient: any
+    size: number;
+    constructor(dependencies:any, config:any) {
+        this.size = 0;
+        this.redisClient = dependencies.redisClient;
+    }
+    async get(key: string) {
+        try {
+            return await this.redisClient.GET(key);
+        } catch (e) {
+            console.log("something wrong... ", e)
+        } 
+    }
+
+    async set(key: string, value: string) {
+        try {
+            this.size = this.size+1;
+            return await this.redisClient.SET(key, value);
+        } catch (e) {
+            console.log("something wrong... ", e);
+        }
+    }
+
+    async delete(key: string) {
+        try {
+            this.size = this.size-1;
+            return await this.redisClient.DEL(key);
+        } catch (e) {
+            console.log("something wrong... ", e);
+        }
+    }
+
+}
 class EventHandler {
 
     [key:string]: any
     io:any
-    connectedSockets:Map<string, string>
-
+    connectedSockets:ActiveSockets//Map<string, string>
     @Inject
     webSocketManager:WebSocketManager
     constructor(dependencies:any, config:any) {
         this.io = dependencies.webSocketIOServer
-        this.connectedSockets = new Map<string, string>();
+        //this.connectedSockets = new Map<string, string>(); // In memory implementation of userid-socketid map 
+        this.connectedSockets = new ActiveSockets(dependencies, this.config);
     }
 
 
@@ -52,7 +88,7 @@ class EventHandler {
     }
 
     enrichPayloadWithHeaderInfo(socket:CustomSocket, payload:any = {}) {
-        let userInfo:any = socket.handshake.headers['x-ms-user-info'];
+        let userInfo:any = socket.handshake.headers['x-ms-user-info']; 
         if(!userInfo) {
             throw 'Auth Header Missing...'
         }
@@ -63,14 +99,11 @@ class EventHandler {
 
     async connectionHandler(socket: CustomSocket) {
         try {
-            //assume sso gave u the details of the connected socket (like name, userid) in header
-            //ideally the below block is not correct bcs this is a handler after connection is established, ideally if no header is there connection itself should not be validated
-            let userInfo:UserInfo = this.enrichPayloadWithHeaderInfo(socket);
-            this.connectedSockets.set(userInfo.caller_socket_user_info.id, socket.id); 
-            //console.log("CONNECTED CLIENTS = ", this.connectedSockets);
-            //TODO 1:- ideally this key value pair be stored in REDIS, as stroing in memory like this breaks while scaling up the webserver pods, so we need to use a centralized storage like redis to store this info
-            //TODO 2 (optional):- Ensure if there is an active socket with same user connected to server already, disconnect this new connection
+           let userInfo:UserInfo = this.enrichPayloadWithHeaderInfo(socket);
+            await this.connectedSockets.set(userInfo.caller_socket_user_info.id, socket.id); 
+            //TODO 1 (optional):- Ensure if there is an active socket with same user connected to server already, disconnect this new connection
             this.io.emit('socket-pool-size-changed', this.connectedSockets.size) //handler should be in client code
+            console.log('client connected...', socket.id);
             const associatedRoomsOfUser:AssociatedRoomsOfUser = await this.webSocketManager.addUserIntoRooms(socket, userInfo.caller_socket_user_info);
             // fetch and emit(self) all the message sent to this socket by various other sockets (in different rooms), when this socket is not connected
             await this.webSocketManager.fetchUndeliveredMessages(socket, associatedRoomsOfUser);
@@ -85,9 +118,9 @@ class EventHandler {
     }
     
 
-    disConnectionHandler(socket: CustomSocket):void {
+    async disConnectionHandler(socket: CustomSocket):Promise<void> {
         let userInfo:any = socket.handshake.headers['x-ms-user-info'];
-        this.connectedSockets.delete(JSON.parse(userInfo).id)
+        await this.connectedSockets.delete(JSON.parse(userInfo).id)
         this.io.emit('socket-pool-size-changed', this.connectedSockets.size) // emit to all active sockets
         console.log("client disconnected...", socket.id)
     }
@@ -124,7 +157,7 @@ class EventHandler {
         //TODO add the group members who are connected to ws server in real time
         for(let i = 0; i<roomMembersExceptAdmin.length; i++) {
             let receiverId = roomMembersExceptAdmin[i];
-            let receiverSocketId = this.connectedSockets.get(receiverId);
+            let receiverSocketId = await this.connectedSockets.get(receiverId);
             let receiverSocket:CustomSocket;
             // if the reciever is  live i.e connected to websocket server
             //join the receievrSocket into the room in realtime

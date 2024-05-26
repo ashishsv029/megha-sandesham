@@ -21,11 +21,11 @@ class RegisterRoutes {
     }
 
     register() {
-        this.app.post('/user', this.identityRouteHandler.createUser.bind(this.identityRouteHandler));
-        this.app.get('/user', this.identityRouteHandler.getUser.bind(this.identityRouteHandler));
-        this.app.post('/room', this.roomRouteHandler.createRoom.bind(this.roomRouteHandler)); // for new group creation
-        this.app.get('/room/:roomId/messages', this.roomRouteHandler.getMessagesOfRoom.bind(this.roomRouteHandler))
-        this.app.get('/user/:name', this.identityRouteHandler.getUserByName.bind(this.identityRouteHandler));
+        this.app.post('/user', this.identityRouteHandler.createUser.bind(this.identityRouteHandler)); //Not used by UI -> Authentication Service APIs are called for register
+        this.app.get('/user', this.identityRouteHandler.getUser.bind(this.identityRouteHandler)); //Not used by UI -> Authentication Service APIs are called for login
+        this.app.post('/room', this.roomRouteHandler.createRoom.bind(this.roomRouteHandler)); // Introduce a middleware (gateway) before the route handler is called -> the gateway middleware validates the JWT and sets header
+        this.app.get('/room/:roomId/messages', this.roomRouteHandler.getMessagesOfRoom.bind(this.roomRouteHandler)) // Introduce a middleware (gateway) before the route handler is called -> the gateway middleware validates the JWT and sets header
+        this.app.get('/user/:name', this.identityRouteHandler.getUserByName.bind(this.identityRouteHandler)); // Introduce a middleware (gateway) before the route handler is called -> the gateway middleware validates the JWT and sets header
     }
 
 

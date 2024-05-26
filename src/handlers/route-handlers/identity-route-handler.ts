@@ -46,6 +46,7 @@ class IdentityRouteHandler {
 
     }
 
+    // Moving this to Spring Boot project
     async createUser(req: Request, res: Response) {
         
         try {

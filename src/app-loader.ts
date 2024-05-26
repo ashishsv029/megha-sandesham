@@ -70,6 +70,7 @@ class AppLoader {
         let redisClient = await createClient({ 
             url: this.config.redis.connectionString 
         }).on('error', err => console.log('Redis Client Error', err)).connect();
+        this.dependencies.redisClient = redisClient;
         this.dependencies.webSocketIOServer = new Server(this.dependencies.httpAppServer, {
             cors: {
                 origin: "http://localhost:3000" // allow requests from react app - only while local testing

@@ -4,6 +4,10 @@
 //binaryTarget to specify the exact binary is needed when executing prisma commands on alpine linux
 //https://www.prisma.io/docs/orm/prisma-schema/overview/generators
 
+// NOTE:--
+// When updating this file, please ensure to create migrations using command npx prisma migrate dev --name <migration_name>
+// After creating migration file, then only run the docker-compose up command, so the client will be generated based on the updated migrations and also deploys with same changes
+
 generator client {
   provider = "prisma-client-js"
   // for more details regarding the params see the user-db-accessor file
@@ -25,9 +29,11 @@ enum RoomTypes {
 }
 
 model user {
-  id   String     @id @default(uuid())
+  id   String     @id @default(uuid()) @db.Uuid
   name  String
   email String  @unique
+  password String @default("password")
+  profile_pic String @default("profile_pic")
   created_at DateTime  @default(now())
   modified_at DateTime @default(now()) @updatedAt
   messagesSent message[] @relation("MessagesFromUser")
@@ -37,11 +43,11 @@ model user {
 }
 
 model room {
-  id     String      @id @default(uuid())
+  id     String      @id @default(uuid()) @db.Uuid
   name    String
   type    RoomTypes
-  admin   String?
-  roomAdmin user? @relation("UserAdminsRoom", fields:[admin], references:[id])
+  admin   String? @db.Uuid
+  roomAdmin user? @relation("UserAdminsRoom", fields:[admin], references:[id], onDelete: Cascade, onUpdate: Cascade)
   min_participants Int @default(2)
   max_participants Int
   is_private Boolean
@@ -53,14 +59,14 @@ model room {
 
 //to_user can be removed also as everyone in the room (dm: 2 mems, group:all others in group) will be notified
 model message {
-  id     String       @id @default(uuid())
+  id     String       @id @default(uuid()) @db.Uuid
   text    String
-  from_user   String
-  to_user     String?
-  fromUser  user      @relation("MessagesFromUser", fields: [from_user], references: [id])
-  toUser    user?      @relation("MessagesToUser", fields: [to_user], references: [id])
-  room_id String
-  roomMessages    room      @relation("MessageSentInRoom", fields: [room_id], references: [id])
+  from_user String @db.Uuid
+  to_user   String? @db.Uuid
+  fromUser  user      @relation("MessagesFromUser", fields: [from_user], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  toUser    user?      @relation("MessagesToUser", fields: [to_user], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  room_id String @db.Uuid
+  roomMessages    room      @relation("MessageSentInRoom", fields: [room_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   is_sent Boolean @default(true)
   is_delivered Boolean @default(false)
   is_seen Boolean @default(false)

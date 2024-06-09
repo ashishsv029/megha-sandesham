@@ -62,7 +62,17 @@ class UserDbAccessor {
                     id: userId
                 },
                 include: {
-                    associatedRooms: true
+                    associatedRooms: {
+                        include: {
+                            associatedUsers: {
+                                select: {
+                                    profile_pic:true,
+                                    email:true,
+                                    name:true
+                                }
+                            }
+                        }
+                    }
                 }
             })
         } catch (err) {
@@ -71,6 +81,27 @@ class UserDbAccessor {
         } finally {
             await this.prisma.$disconnect
         }
+    }
+
+
+    async fetchUsersByRoomId(roomIds:string[]) {
+
+        try {
+            return await this.prisma.room.findMany({
+                where: {
+                  id: roomIds,
+                },
+                select: {
+                  associatedUsers: true,
+                },
+              }).associatedUsers();
+        } catch (err) {
+            console.log(err);
+            throw err;
+        } finally {
+            await this.prisma.$disconnect
+        }
+
     }
 
 

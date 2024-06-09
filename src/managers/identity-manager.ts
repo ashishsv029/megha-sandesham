@@ -49,6 +49,15 @@ class IdentityManager {
         }
     }
 
+    async fetchUsersByRoomId(roomIds:string[]) {
+        try {
+            return await this.userDBAccessor.fetchUsersByRoomId(roomIds);
+        } catch (error) {
+            throw error;
+        }
+
+    }
+
 }
 
 

@@ -1,12 +1,16 @@
 import { Request, Response } from 'express';
 import IdentityManager from '../../managers/identity-manager';
 import {Inject} from "typescript-ioc"
+import WebSocketManager from '../../managers/web-socket-manager';
 
 class IdentityRouteHandler {
     [key:string]:{}
     
     @Inject
     private identityManager!:IdentityManager
+
+    @Inject
+    private webSocketManager: WebSocketManager // Till Utils Todo is implemeneted use it from websocket manager
 
     constructor(dependencies:any, config:any) {}
 
@@ -38,6 +42,7 @@ class IdentityRouteHandler {
         };
         try {
             const fetchedUser = await this.identityManager.getUserByName(payload);
+            fetchedUser.profile_pic = await this.webSocketManager.fetchSignedURLOfImageFromS3(fetchedUser.profile_pic);
             res.status(200).json(fetchedUser)
         } catch (err) {
             console.log("err--", err)

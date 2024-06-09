@@ -4,6 +4,10 @@ import IdentityManager from "./identity-manager";
 import MessageManager from "./message-manager";
 import {UserInfo, CallerSocketUserInfo, AssociatedRoomsOfUser} from "../../typings/handlers/event-handler-types"
 import { Inject } from "typescript-ioc";
+import 'dotenv/config'; //This ensures that the environment variables from the .env file are loaded into process.env
+import AWS from 'aws-sdk';
+import { User } from "aws-sdk/clients/budgets";
+
 /// <reference path="../../global-types.d.ts" />
 interface Room {
     [key:string]: any;
@@ -12,6 +16,7 @@ class WebSocketManager {
 
     [key:string]:{}
     private io: any
+    private s3: any
     @Inject
     private roomManager:RoomManager
 
@@ -23,6 +28,11 @@ class WebSocketManager {
 
     constructor(dependencies:Dependencies, config:Config) {
         this.io = dependencies.webSocketIOServer
+        this.s3 = new AWS.S3({
+            accessKeyId: process.env.S3_ACCESS_KEY_ID,
+            secretAccessKey: process.env.S3_SECRET_KEY,
+            region: process.env.S3_REGION
+        });
     }
 
     //for unit testing purpose
@@ -50,13 +60,51 @@ class WebSocketManager {
         return await this._identityManager.fetchRoomsByUserId(userInfo.id);   
     }
 
+    // TODO :- Move to Utils class
+    async fetchSignedURLOfImageFromS3(url:string):Promise<string> {
+        const params = {
+            Bucket: process.env.S3_BUCKET_NAME,
+            Key: url,
+            Expires: 60 // URL expiration time in seconds
+        };
+
+        return new Promise((resolve, reject) => {
+            this.s3.getSignedUrl('getObject', params, (err:any, signedUrl:string) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(signedUrl);
+                }
+            });
+        });
+        
+    }
+
     async addUserIntoRooms(socket:Socket, userInfo:CallerSocketUserInfo) {
         const associatedRoomsOfUser = await this.fetchRoomsAssociatedToUser(userInfo);
-        const associatedRoomIds:string[] = associatedRoomsOfUser.associatedRooms.map((room:Room) => room.id);
+        delete associatedRoomsOfUser.password;
+        let associatedRoomIds:string[] = [];
+        for(const room of associatedRoomsOfUser.associatedRooms) {
+            for(const roomUser of room.associatedUsers) {
+
+                let preSignedURL:string = ""; //any default user pic from local storage
+                try {
+                    preSignedURL = await this.fetchSignedURLOfImageFromS3(roomUser.profile_pic);
+                } catch (err) {
+                    console.log("error while fetching signed url of the room profile pic");
+                }
+                roomUser.profile_pic = preSignedURL
+            }
+            associatedRoomIds.push(room.id);
+        }
         associatedRoomIds.forEach((roomId:string) => {
             socket.join(roomId);
-            //socket.emit('room-joined', roomId);
         })
+        try {
+            associatedRoomsOfUser.profile_pic = await this.fetchSignedURLOfImageFromS3(associatedRoomsOfUser.profile_pic);
+        } catch (err) {
+            console.log("error while fetching signed url of the user profile pic");
+        }
         socket.emit('response', {...associatedRoomsOfUser, response_type:'associatedRoomsOfUserInfo'})
         return associatedRoomsOfUser;
     }

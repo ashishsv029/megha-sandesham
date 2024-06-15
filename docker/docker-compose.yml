@@ -23,8 +23,8 @@ services:
             - type: volume
               source: postgresdata
               target: /var/lib/postgresql/data # by default postgres stored data in this file.. so we need to replace this path with our created volume.. so the data is stored in postgresql container as well as mirrored into volume
-        ports:
-            - 5432:5432 #Before executing with this, ensure local postgres is stopped, so that host port 5432 is available
+        # ports:
+        #     - 5432:5432 #Before executing with this, ensure local postgres is stopped, so that host port 5432 is available
     app:
         container_name: meghasandesham
         build:
@@ -39,6 +39,7 @@ services:
         depends_on:
             - redis
             - postgres
+            - authentication-service
         entrypoint: [] #["bash", "-c"]
         command: dockerize -wait tcp://redis:6379 -wait tcp://postgres:5432 -timeout 180s bash -c "echo please create an app start script && chmod +x run-app.sh && sh run-app.sh"
                 #run a bash file which starts the app and the app's prerequisite command
@@ -49,6 +50,18 @@ services:
         ports:
             - 3100:3100
     
+    authentication-service:
+        image: ashishsv029/authentication-service:1.0.0
+        container_name: authentication-service
+        depends_on:
+            - postgres
+        command: dockerize -wait tcp://postgres:5432 -timeout 180s bash -c "echo able to connect to postgres"
+        networks:
+            - meghasandesham-main
+        ports:
+            - 3200:3200
+        
+
 networks:
     meghasandesham-main:
         driver: bridge

@@ -30,7 +30,7 @@ class RegisterEvents {
                 if( jwt == '' ){
                     throw 'Invalid JWT';
                 }
-                const response = await fetch('http://localhost:3200/user/validate', {
+                const response = await fetch('http://authentication-service:3200/user/validate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

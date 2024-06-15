@@ -167,7 +167,7 @@ class EventHandler {
                 receiverSocket = this.io.sockets.sockets.get(receiverSocketId); //TODO:- change it to using await fetchSockets() as it works with multiple Socket.IO servers, hence the await operator.
                 receiverSocket.join(group.id);
                 console.log("emitting room joined event to receiver socket")
-                receiverSocket.emit('room-joined', group)
+                receiverSocket.emit('room-joined', group) //TODO Need to add asociatedUsers also in the room response, so that sender image gets loaded for the receiever on getting the 1st message
             }
         }
         if(group.type == 'group') {

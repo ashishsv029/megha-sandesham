@@ -9,11 +9,32 @@ services:
             - type: volume
               source: redisdata
               target: /var/lib/redis
+    
+    nginx:
+        image: ashishsv029/nginx:8.0.0
+        container_name: nginx
+        networks:
+            - meghasandesham-main
+        ports:
+            - 80:80
+            - 443:443
+        depends_on:
+            - authentication-service
+            - app
+            - meghasandesham-frontend
+        volumes:
+            - type: bind
+              source: /var/www/certbot
+              target: /var/www/certbot
+            - type: bind
+              source: /etc/letsencrypt
+              target: /etc/letsencrypt
 
     postgres:
-        build:
-            context: ../
-            dockerfile: ./docker/postgres/Dockerfile
+        image: ashishsv029/postgres:1.0.0
+        # build: - comment this build when using already built image directly
+        #     context: ../
+        #     dockerfile: ./docker/postgres/Dockerfile
         container_name: postgres
         # environment:
         #     - POSTGRES_PASSWORD=password --optional if you are creating other databases (as a part of sql file that was copied inside initdb.d file)
@@ -26,14 +47,15 @@ services:
         # ports:
         #     - 5432:5432 #Before executing with this, ensure local postgres is stopped, so that host port 5432 is available
     app:
+        image: ashishsv029/meghasandesham:1.0.0
         container_name: meghasandesham
-        build:
-            context: ../
-            #dockerfile: ./docker/app/Dockerfile
-            dockerfile: ./docker/app/multistage/Dockerfile
-            #dockerfile: ./docker/app/multistage/minimalistic-base/Dockerfile
+        # build: - comment this build when using already built image directly
+        #     context: ../
+        #     #dockerfile: ./docker/app/Dockerfile
+        #     dockerfile: ./docker/app/multistage/Dockerfile
+        #     #dockerfile: ./docker/app/multistage/minimalistic-base/Dockerfile
             
-            target: finalstage #this is not present in plain Dockerfile
+        #     target: finalstage #this is not present in plain Dockerfile
 
 
         depends_on:
@@ -51,7 +73,7 @@ services:
             - 3100:3100
     
     authentication-service:
-        image: ashishsv029/authentication-service:1.0.0
+        image: ashishsv029/authentication-service:7.0.0
         container_name: authentication-service
         depends_on:
             - postgres
@@ -60,6 +82,18 @@ services:
             - meghasandesham-main
         ports:
             - 3200:3200
+
+    meghasandesham-frontend:
+        image: ashishsv029/meghasandesham-ui:1.0.0
+        container_name: meghasandesham-frontend
+        depends_on:
+            - app
+            - authentication-service
+        networks:
+            - meghasandesham-main
+        ports:
+            - 3000:3000
+
         
 
 networks:

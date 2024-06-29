@@ -22,13 +22,13 @@ services:
             - authentication-service
             - app
             - meghasandesham-frontend
-        volumes: #not needed, as we are not using letsencrypt/certbot challenge
-            - type: bind
-              source: /var/www/certbot
-              target: /var/www/certbot
-            - type: bind
-              source: /etc/letsencrypt
-              target: /etc/letsencrypt
+        # volumes: #not needed, as we are not using letsencrypt/certbot challenge
+        #     - type: bind
+        #       source: /var/www/certbot
+        #       target: /var/www/certbot
+        #     - type: bind
+        #       source: /etc/letsencrypt
+        #       target: /etc/letsencrypt
 
     postgres:
         image: ashishsv029/postgres:1.0.0

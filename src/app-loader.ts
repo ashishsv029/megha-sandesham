@@ -73,7 +73,7 @@ class AppLoader {
         this.dependencies.redisClient = redisClient;
         this.dependencies.webSocketIOServer = new Server(this.dependencies.httpAppServer, {
             cors: {
-                origin: "http://localhost:3000" // allow requests from react app - only while local testing
+                origin: "*" // allow requests from react app - only while local testing
             },
             adapter: createAdapter(redisClient) // for facilitating communication bw clients connected to multiple ws servers
             // Read this:- https://socket.io/docs/v4/redis-streams-adapter/ 

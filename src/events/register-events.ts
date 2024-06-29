@@ -26,8 +26,12 @@ class RegisterEvents {
             // Validate the jwt using the authentication service client
             // On successful validation, remove the authorization header and attach x-ms-user-info header in socket.handshake.headers 
             try {
-                let jwt:string = socket.handshake.headers['authorization'] || '';
+                // Todo while proxying from reverse proxy, the custom authorization header is being dropped off by the proxy server (TODO:- Investigate and Fix).. So getting the JWT value from cookie for now
+                let jwt:string = socket.handshake.headers['authorization'] || socket.handshake.headers['cookie']?.split('; ')[1].split('=')[1] ||'';
+                //console.log("headers = ", socket.headers);
                 if( jwt == '' ){
+                    console.log('jwt is empty.. so throwing..', socket.handshake.headers);
+
                     throw 'Invalid JWT';
                 }
                 const response = await fetch('http://authentication-service:3200/user/validate', {
@@ -40,6 +44,7 @@ class RegisterEvents {
                     })
                 });
                 if (!response.ok) {
+                    console.log('response not okay.. so throwing..');
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
@@ -48,9 +53,13 @@ class RegisterEvents {
                     id: claimsData.user_id,
                     name: claimsData.user_name
                 });
-                console.log(claimsData);
+                console.log("claimsData - ", claimsData);
             } catch (err) {
-                throw 'Invalid JWT';
+                console.log('"Err==', err);
+
+                socket.emit('response', {message: 'Issue while connecting'})
+                return;
+                //throw 'Invalid JWT'; - This makes the server crash and restart again by compose commands and the browser keeps retrying, making this to go into a infinte loop
             }
             console.log("Connection Established...", );
             this.registerSocketEvents(socket)

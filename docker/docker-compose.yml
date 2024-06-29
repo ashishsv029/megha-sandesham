@@ -11,7 +11,7 @@ services:
               target: /var/lib/redis
     
     nginx:
-        image: ashishsv029/nginx:8.0.0
+        image: ashishsv029/nginx:23.0.0
         container_name: nginx
         networks:
             - meghasandesham-main
@@ -22,7 +22,7 @@ services:
             - authentication-service
             - app
             - meghasandesham-frontend
-        volumes:
+        volumes: #not needed, as we are not using letsencrypt/certbot challenge
             - type: bind
               source: /var/www/certbot
               target: /var/www/certbot
@@ -47,7 +47,7 @@ services:
         # ports:
         #     - 5432:5432 #Before executing with this, ensure local postgres is stopped, so that host port 5432 is available
     app:
-        image: ashishsv029/meghasandesham:1.0.0
+        image: ashishsv029/meghasandesham:7.0.0
         container_name: meghasandesham
         # build: - comment this build when using already built image directly
         #     context: ../
@@ -56,8 +56,6 @@ services:
         #     #dockerfile: ./docker/app/multistage/minimalistic-base/Dockerfile
             
         #     target: finalstage #this is not present in plain Dockerfile
-
-
         depends_on:
             - redis
             - postgres
@@ -69,11 +67,11 @@ services:
         restart: on-failure
         networks:
             - meghasandesham-main
-        ports:
+        ports: # used while local testing
             - 3100:3100
     
     authentication-service:
-        image: ashishsv029/authentication-service:7.0.0
+        image: ashishsv029/authentication-service:12.0.0
         container_name: authentication-service
         depends_on:
             - postgres
@@ -84,7 +82,7 @@ services:
             - 3200:3200
 
     meghasandesham-frontend:
-        image: ashishsv029/meghasandesham-ui:1.0.0
+        image: ashishsv029/meghasandesham-ui:13.0.0
         container_name: meghasandesham-frontend
         depends_on:
             - app
@@ -93,6 +91,16 @@ services:
             - meghasandesham-main
         ports:
             - 3000:3000
+    # use this command locally to start the ngrok container for using the publicly accessible tunnel URL
+    # docker run --net=host -it -e NGROK_AUTHTOKEN=<get it from local> ngrok/ngrok:latest http 443        
+    # ngrok: - Commenting as logs are not coming.. need to investigate
+    #     image: ngrok/ngrok:latest
+    #     network_mode: host
+    #     environment:
+    #         - NGROK_AUTHTOKEN=<get it from local>
+    #     command: http 443 #the traffic is tunnelled to 443 port, where reverse proxy nginx is listening
+    #     stdin_open: true
+    #     tty: true
 
         
 

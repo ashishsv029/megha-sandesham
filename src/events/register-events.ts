@@ -19,6 +19,17 @@ class RegisterEvents {
         this.io = dependencies.webSocketIOServer;
     }
 
+    getCookieValue(cookieString: string, cookieName: string):string {
+        // Splitting the cookie string into individual cookies and also trim extra space before
+        const cookies = cookieString.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(cookieName + '=')) {
+            return cookie.substring((cookieName + '=').length); // i.e returns the value part (everything after the '=')
+          }
+        }
+        return '';
+    }
 
     register() {
         this.io.on('connection', async (socket:CustomSocket):Promise<void> => {
@@ -27,7 +38,10 @@ class RegisterEvents {
             // On successful validation, remove the authorization header and attach x-ms-user-info header in socket.handshake.headers 
             try {
                 // Todo while proxying from reverse proxy, the custom authorization header is being dropped off by the proxy server (TODO:- Investigate and Fix).. So getting the JWT value from cookie for now
-                let jwt:string = socket.handshake.headers['authorization'] || socket.handshake.headers['cookie']?.split('; ')[1].split('=')[1] ||'';
+                console.log("socket headers = ", socket.handshake.headers);
+                // let jwt:string = socket.handshake.headers['authorization'] || socket.handshake.headers['cookie']?.split('; ')[1].split('=')[1] ||'';
+                let jwt:string = socket.handshake.headers['authorization'] || this.getCookieValue(socket.handshake.headers['cookie'] || '', 'authToken1');
+                
                 //console.log("headers = ", socket.headers);
                 if( jwt == '' ){
                     console.log('jwt is empty.. so throwing..', socket.handshake.headers);

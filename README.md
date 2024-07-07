@@ -5,10 +5,10 @@ A polyglot microservices-based application developed for chatting and message sc
 
 1. Chatting Service. Tech Stack:-  | TypeScript | NodeJS | Websockets(Socket.io) |
 2. Authentication Service. Tech Stack:- | Java Spring Boot | Spring Security |
-         3. UI Service. Tech Stack:- | React JS | HTML and CSS Fundementals like Flexbox etc |
-         4. Nginx Service. (Used as a Reverse Proxy)
-         5. Postgres. (Relational Database for both Chatting Service and Authentication Service)
-         6. Redis. (Used for storing User-Socket Map and for Socket Redis Adapater useful if chatting service is scaled up) 
+3. UI Service. Tech Stack:- | React JS | HTML and CSS Fundementals like Flexbox etc |
+4. Nginx Service. (Used as a Reverse Proxy)
+5. Postgres. (Relational Database for both Chatting Service and Authentication Service)
+6. Redis. (Used for storing User-Socket Map and for Socket Redis Adapater useful if chatting service is scaled up) 
 
 ## Architecture
 

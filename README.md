@@ -40,11 +40,11 @@ V1.0.0
 
 # Todos:-
 
-1. Add cron handling for all scheduled messages - change UI of the scheduled messages
-2. Add proper session management, signIn and Signup flows using proper authentication and authorization workflows (or use java springboot project for doing the same)
-3. Add Images handling for 1. profile photos 2. Sending Images
+1. Add cron handling for all scheduled messages - change UI of the scheduled messages -  ToDo
+2. Add proper session management, signIn and Signup flows using proper authentication and authorization workflows (or use java springboot project for doing the same) - Done (Using Spring Security, JWT Based authentication)
+4. Add Images handling for 1. profile photos 2. Sending Images - Done (using AWS S3 and presigned URLs)
 
 PHASE 2:
 
-1. AWS deployment
-2. CI CD Pipleline
+1. AWS deployment - Done (Using ECS Fargate)
+2. CI CD Pipleline - ToDO

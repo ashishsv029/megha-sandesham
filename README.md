@@ -1,5 +1,5 @@
-# megha-sandesham
-V1.0.0
+# Project MeghaSandesham - A Chatting and Message Scheduling Application
+V8.0.0
 
 ## Available Features
 1. Basic User Signup/Signin

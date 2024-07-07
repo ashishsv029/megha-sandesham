@@ -1,5 +1,21 @@
-# Project MeghaSandesham - A Chatting and Message Scheduling Application
+# Project MeghaSandesham
 V8.0.0
+
+A polyglot microservices-based application developed for chatting and message scheduling. The architecture includes 6 different micro services 
+         i.   Chatting Service. Tech Stack:-  | TypeScript | NodeJS | Websockets(Socket.io) |
+         ii.  Authentication Service. Tech Stack:- | Java Spring Boot | Spring Security |
+         iii. UI Service. Tech Stack:- | React JS | HTML and CSS Fundementals like Flexbox etc |
+         iv.  Nginx Service. (Used as a Reverse Proxy)
+         v.   Postgres. (Relational Database for both Chatting Service and Authentication Service)
+         vi.  Redis. (Used for storing User-Socket Map and for Socket Redis Adapater useful if chatting service is scaled up) 
+
+## Architecture
+
+## Image Registries Link
+The Microservices images are pushed into publicly visible repositories in these registries
+
+1. Dockerhub Registry :- https://hub.docker.com/u/ashishsv029
+2. AWS ECR Registry :- https://ap-south-1.console.aws.amazon.com/ecr/public-registry/repositories?region=ap-south-1 (only accessed by me)
 
 ## Available Features
 1. Basic User Signup/Signin

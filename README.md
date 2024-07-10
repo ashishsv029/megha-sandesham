@@ -13,8 +13,6 @@ A polyglot microservices-based application developed for chatting and message sc
 | 4    | Nginx Service         | Used as a Reverse Proxy                                                                               | <br>![Nginx](https://img.shields.io/badge/-Nginx-009639?style=flat&logo=nginx&logoColor=white)                                           | [https://github.com/ashishsv029/megha-sandesham-nginx](https://github.com/ashishsv029/megha-sandesham-nginx)      |
 | 5    | Postgres              | Relational Database for both Chatting Service and Authentication Service                              | ![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-336791?style=flat&logo=postgresql&logoColor=white)                                                                   |                                                                                                                  |
 | 6    | Redis                 | Used for storing User-Socket Map and for Socket Redis Adapter, useful when chatting service is scaled up | <br>![Redis](https://img.shields.io/badge/-Redis-DC382D?style=flat&logo=redis&logoColor=white)                                                                    |                                                                                                                  |
-                                                                         |
-
 
 ## Architecture
 1. Local Deployment Architecture (using HTTP Tunneling using ngrok)

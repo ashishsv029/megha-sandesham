@@ -11,6 +11,16 @@ A polyglot microservices-based application developed for chatting and message sc
 6. Redis. (Used for storing User-Socket Map and for Socket Redis Adapater, useful when chatting service is scaled up) 
 
 ## Architecture
+1. Planned Architecture:
+![MeghaSandeshaPlannedDeploymentArchitecture](https://github.com/ashishsv029/megha-sandesham/blob/master/public/readme_images/MeghaSandeshamPropesdDeploymentArchitecture.png)
+The inter task communication will be happening by setting service discovery and by creating a cloud map namespace. We can also add another nginx in private subnet for communication between private subnet containers
+
+2. Present Deployed Architecture:
+![MeghaSandeshaCurrentDeploymentArchitecture](https://github.com/ashishsv029/megha-sandesham/blob/master/public/readme_images/MeghaSandeshamAWSCurrentArchitecture.png)
+For time being and cost saving purpose, I deployed all the containers in a single task. As multiple containers within a task in awsvpc networking mode will share the task ENI and the network namespace, so they can communicate to each other using localhost (or the equivalent 127.0.0.1 loopback IP address). But it will not be a good design if we want to scale up individual tasks
+
+3. Local Deployment Architecture (using HTTP Tunnelling using ngrok)
+![MeghaSandeshaLocalDeploymentArchitecture](https://github.com/ashishsv029/megha-sandesham/blob/master/public/readme_images/MeghaSandeshamLocalDeployment.png)
 
 ## Image Registries Link
 The Microservices images are pushed into publicly visible repositories in these registries

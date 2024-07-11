@@ -16,14 +16,17 @@ A polyglot microservices-based application developed for chatting and message sc
 
 ## Architecture
 1. Local Deployment Architecture (using HTTP Tunneling using ngrok)
-![MeghaSandeshaLocalDeploymentArchitecture](https://github.com/ashishsv029/megha-sandesham/blob/master/public/readme_images/MeghaSandeshamLocalDeployment.png)
+![MeghaSandeshamLocalDeploymentArchitecture](https://github.com/ashishsv029/megha-sandesham/blob/master/public/readme_images/MeghaSandeshamLocalDeployment.png)
 
-2. AWS Planned Architecture:
-![MeghaSandeshaPlannedDeploymentArchitecture](https://github.com/ashishsv029/megha-sandesham/blob/master/public/readme_images/MeghaSandeshamPropesdDeploymentArchitecture.png)
+2. MeghaSandesham UI (ReactJS):-
+![MeghaSandeshamUI](https://github.com/ashishsv029/megha-sandesham/blob/master/public/readme_images/MeghaSandesham-UI.png)
+
+3. AWS Planned Architecture:
+![MeghaSandeshamPlannedDeploymentArchitecture](https://github.com/ashishsv029/megha-sandesham/blob/master/public/readme_images/MeghaSandeshamPropesdDeploymentArchitecture.png)
 The inter task communication will be happening by setting service discovery and by creating a cloud map namespace. We can also add another nginx in private subnet for communication between private subnet containers
 
-3. AWS Present Deployed Architecture:
-![MeghaSandeshaCurrentDeploymentArchitecture](https://github.com/ashishsv029/megha-sandesham/blob/master/public/readme_images/MeghaSandeshamAWSCurrentArchitecture.png)
+4. AWS Present Deployed Architecture:
+![MeghaSandeshamCurrentDeploymentArchitecture](https://github.com/ashishsv029/megha-sandesham/blob/master/public/readme_images/MeghaSandeshamAWSCurrentArchitecture.png)
 For time being and cost saving purpose, I deployed all the containers in a single task. As multiple containers within a task in awsvpc networking mode will share the task ENI and the network namespace, so they can communicate to each other using localhost (or the equivalent 127.0.0.1 loopback IP address). But it will not be a good design if we want to scale up individual tasks
 
 
